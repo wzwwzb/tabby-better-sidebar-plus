@@ -155,6 +155,8 @@ export class SidebarPlusConfigProvider extends ConfigProvider {
             // trigger itself, and the grace period it deliberately does not
             // shortcut.
             sftpAutoReturnToProfiles: true,
+            // 跟踪终端当前目录的初始状态；用户切换后会保存自己的选择。
+            sftpFollowTerminalDirectory: true,
             // Seconds between two latency probes of each live SSH session, 0 to
             // disable. Off by default, like the SFTP auto-refresh above and for
             // a comparable reason: a probe is a real request sent to a real
@@ -172,6 +174,8 @@ export class SidebarPlusConfigProvider extends ConfigProvider {
             // every transfer, so keeping both means a popup covering the tabs on
             // top of a panel that already says it. Untick to get it back.
             hideNativeTransfersMenu: true,
+            // 默认保留 Tabby 的原生 SFTP 按钮，由用户主动选择隐藏。
+            hideNativeSftpButton: false,
             // Per-block switches. All default to true: these blocks are what
             // was asked for and built, so defaulting them off would make
             // delivered features vanish on a plugin update.
@@ -206,6 +210,8 @@ export class SidebarPlusConfigProvider extends ConfigProvider {
             showRecentProfiles: false,
             showTunnels: true,
             showSftp: true,
+            // Linux 服务器指标通过单独的 SSH 命令通道只读采集。
+            showSystemInfo: true,
             showTransfers: true,
             showWorkspaces: true,
             // How `.workspace-bar` itself is shown once showWorkspaces is on:

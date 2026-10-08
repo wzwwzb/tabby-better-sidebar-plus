@@ -10,12 +10,33 @@ sidebar-plus-sftp-browser {
     overflow: hidden;
 }
 
-sidebar-plus-sftp-browser .sftp-toolbar,
+sidebar-plus-sftp-browser .sftp-toolbar {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: .1rem;
+    padding: .15rem .1rem;
+    min-width: 0;
+}
+
 sidebar-plus-sftp-browser .sftp-filter-bar {
     flex: none;
     gap: .1rem;
     padding: .15rem .1rem;
     min-width: 0;
+}
+
+sidebar-plus-sftp-browser .sftp-path-row,
+sidebar-plus-sftp-browser .sftp-action-row {
+    width: 100%;
+    min-width: 0;
+}
+
+sidebar-plus-sftp-browser .sftp-action-row {
+    flex: none;
+    flex-wrap: wrap;
+    gap: .1rem;
 }
 
 sidebar-plus-sftp-browser .sftp-tool {
@@ -70,6 +91,11 @@ sidebar-plus-sftp-browser .sftp-breadcrumb {
         &:last-child::after {
             content: '';
         }
+    }
+
+    .crumb-root::after {
+        content: '';
+        margin: 0;
     }
 }
 

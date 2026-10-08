@@ -19,6 +19,48 @@
  * zero change).
  */
 const fr_FR: Record<string, string> = {
+    // sftpBrowser.component.pug — bouton de suivi du répertoire du terminal.
+    'Follow terminal directory': 'Suivre le répertoire du terminal',
+    'Stop following terminal directory': 'Arrêter le suivi du répertoire du terminal',
+    'Waiting for the terminal to report its current directory.': 'En attente du répertoire actuel signalé par le terminal.',
+    'Double-click to edit the path. Right-click to copy the full path.': 'Double-cliquez pour modifier le chemin. Faites un clic droit pour copier le chemin complet.',
+    'Full remote path copied to clipboard.': 'Chemin distant complet copié dans le presse-papiers.',
+    'Could not copy the remote path.': 'Impossible de copier le chemin distant.',
+
+    // systemInfo.component.ts — panneau de suivi du système.
+    'Active SSH session': 'Session SSH active',
+    'System information': 'Informations système',
+    'System information of the active SSH session': 'Informations système de la session SSH active',
+    'Open system information of this session': 'Ouvrir les informations système de cette session',
+    'Live': 'En direct',
+    'Loading…': 'Chargement…',
+    'Select an open SSH tab to view its Linux system information.': 'Sélectionnez un onglet SSH ouvert pour voir les informations système Linux.',
+    'Reading system information…': 'Lecture des informations système…',
+    'Uptime': 'Durée de fonctionnement',
+    'Load': 'Charge',
+    'CPU': 'CPU',
+    'CPU usage': 'Utilisation CPU',
+    'Memory': 'Mémoire',
+    'Memory usage': 'Utilisation mémoire',
+    'Swap': 'Swap',
+    'Swap usage': 'Utilisation du swap',
+    'Top processes': 'Processus principaux',
+    'No process data is available.': 'Aucune donnée de processus disponible.',
+    'Network interface': 'Interface réseau',
+    'Network traffic for {interface}': 'Trafic réseau de {interface}',
+    'No network interfaces found.': 'Aucune interface réseau trouvée.',
+    'Filesystems': 'Systèmes de fichiers',
+    'Path': 'Chemin',
+    'Available / size': 'Disponible / taille',
+    'No local filesystem data is available.': 'Aucune donnée de système de fichiers local disponible.',
+    'The remote system monitor stopped.': 'Le suivi du système distant s’est arrêté.',
+    'This SSH server does not allow remote commands.': 'Ce serveur SSH interdit les commandes distantes.',
+    'System information is available for Linux SSH servers only.': 'Les informations système sont disponibles uniquement sur les serveurs SSH Linux.',
+    'The remote system returned unreadable statistics.': 'Le système distant a renvoyé des statistiques illisibles.',
+    'Switch to another SSH tab, then return to this one to retry.': 'Passez à un autre onglet SSH, puis revenez ici pour réessayer.',
+    'Reads Linux performance and filesystem statistics over SSH.': 'Lit les statistiques Linux de performance et de stockage via SSH.',
+    'CPU, memory, processes, network traffic and local filesystems.': 'CPU, mémoire, processus, trafic réseau et systèmes de fichiers locaux.',
+
     // sftpPanel.component.ts — header line, auto-return-to-Profiles notices
     'SSH session lost ({tab}) — back to Profiles view': 'Session SSH perdue ({tab}) — retour sur la vue Profils',
     'SSH session lost — back to Profiles view': 'Session SSH perdue — retour sur la vue Profils',
@@ -158,7 +200,6 @@ const fr_FR: Record<string, string> = {
     'Symbolic link': 'Lien symbolique',
 
     // sftpBrowser.component.pug — toolbar
-    'Double-click to type a path': 'Double-cliquer pour saisir un chemin',
     'Type the path by hand': 'Saisir le chemin à la main',
     'Refresh': 'Actualiser',
     'Filter the list': 'Filtrer la liste',
@@ -453,6 +494,9 @@ const fr_FR: Record<string, string> = {
     'Hide the Tabby transfers menu': 'Masquer le menu des transferts de Tabby',
     'Otherwise the native Tabby menu opens on every transfer.': 'Sinon le menu natif de Tabby s\'ouvre à chaque transfert.',
     'The sidebar panel already shows the same transfers.': 'Le panneau de la sidebar affiche déjà les mêmes transferts.',
+    'Hide the SFTP buttons in the SSH toolbar': 'Masquer les boutons SFTP de la barre d\'outils SSH',
+    'Hides Tabby\'s native button and the SFTP+ button, if installed.': 'Masque le bouton natif de Tabby et celui de SFTP+ si ce plugin est installé.',
+    'The plugin SFTP view in the sidebar remains available.': 'La vue SFTP du plugin dans la sidebar reste disponible.',
 
     // settingsTab.component.ts — features page
     'Each block switches on independently. Nothing is deleted by turning one off.': 'Chaque bloc s\'active indépendamment. Rien n\'est supprimé en l\'éteignant.',

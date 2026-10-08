@@ -10,43 +10,57 @@
 //- double quotes so the single-quoted literal inside passes through intact
 //- — `[title]="'Refresh' | translate"`. Everything else that needed a
 //- literal before i18n existed is still a getter or a wrapper method.
-.sftp-toolbar.d-flex.align-items-center
-    input.form-control.form-control-sm.flex-grow-1(
-        *ngIf='editingPath !== null',
-        type='text',
-        autofocus,
-        (keydown.enter)='confirmPath()',
-        (keydown.esc)='editingPath = null',
-        (blur)='editingPath = null',
-        [(ngModel)]='editingPath'
-    )
-    .sftp-breadcrumb.flex-grow-1(
-        *ngIf='editingPath === null',
-        (dblclick)='editPath()',
-        [title]="'Double-click to type a path' | translate"
-    )
-        a.crumb((click)='goRoot()') /
-        a.crumb(*ngFor='let segment of pathSegments', (click)='navigate(segment.path)') {{ segment.name }}
+//- 路径单独占一行，操作按钮放在第二行，长路径不会再顶到图标下方。
+.sftp-toolbar
+    .sftp-path-row.d-flex.align-items-center
+        input.form-control.form-control-sm.flex-grow-1(
+            *ngIf='editingPath !== null',
+            type='text',
+            autofocus,
+            (keydown.enter)='confirmPath()',
+            (keydown.esc)='editingPath = null',
+            (blur)='editingPath = null',
+            [(ngModel)]='editingPath'
+        )
+        .sftp-breadcrumb.flex-grow-1(
+            *ngIf='editingPath === null',
+            (dblclick)='editPath()',
+            (contextmenu)='copyCurrentPath($event)',
+            [title]='breadcrumbTitle'
+        )
+            a.crumb.crumb-root((click)="navigateFromBreadcrumb('/', $event)") /
+            a.crumb(*ngFor='let segment of pathSegments', (click)='navigateFromBreadcrumb(segment.path, $event)') {{ segment.name }}
 
     //- A title on every button: the captions the native template pairs with
     //- each icon do not fit a sidebar, and an icon on its own says nothing.
-    button.btn.btn-link.btn-sm.sftp-tool(
-        type='button',
-        *ngIf='editingPath === null',
-        (click)='editPath()',
-        [title]="'Type the path by hand' | translate"
-    )
-        .fa.fa-fw.fas.fa-pen
-    button.btn.btn-link.btn-sm.sftp-tool(type='button', (click)='navigate(path)', [title]="'Refresh' | translate")
-        .fa.fa-fw.fas.fa-sync-alt
-    button.btn.btn-link.btn-sm.sftp-tool(type='button', *ngIf='!showFilter', (click)='showFilter = true', [title]="'Filter the list' | translate")
-        .fa.fa-fw.fas.fa-filter
-    button.btn.btn-link.btn-sm.sftp-tool(type='button', (click)='openCreateDirectoryModal()', [title]="'New remote folder' | translate")
-        .fa.fa-fw.fas.fa-folder-plus
-    button.btn.btn-link.btn-sm.sftp-tool(type='button', (click)='upload()', [title]="'Send files to the server' | translate")
-        .fa.fa-fw.fas.fa-file-upload
-    button.btn.btn-link.btn-sm.sftp-tool(type='button', (click)='uploadFolder()', [title]="'Send a folder to the server' | translate")
-        .fa.fa-fw.fas.fa-file-import
+    .sftp-action-row.d-flex.align-items-center.justify-content-end
+        button.btn.btn-link.btn-sm.sftp-tool(
+            type='button',
+            *ngIf='editingPath === null',
+            (click)='editPath()',
+            [title]="'Type the path by hand' | translate"
+        )
+            .fa.fa-fw.fas.fa-pen
+        //- 光标按钮亮起时，SFTP 会跟随当前终端目录。
+        button.btn.btn-link.btn-sm.sftp-tool.sftp-cwd-toggle(
+            type='button',
+            *ngIf='editingPath === null',
+            [class.active]='followTerminalDirectory',
+            [attr.aria-pressed]='followTerminalDirectory',
+            (click)='toggleTerminalDirectoryTracking()',
+            [title]='terminalDirectoryTrackingTitle'
+        )
+            .fa.fa-fw.fas.fa-crosshairs
+        button.btn.btn-link.btn-sm.sftp-tool(type='button', (click)='navigate(path)', [title]="'Refresh' | translate")
+            .fa.fa-fw.fas.fa-sync-alt
+        button.btn.btn-link.btn-sm.sftp-tool(type='button', *ngIf='!showFilter', (click)='showFilter = true', [title]="'Filter the list' | translate")
+            .fa.fa-fw.fas.fa-filter
+        button.btn.btn-link.btn-sm.sftp-tool(type='button', (click)='openCreateDirectoryModal()', [title]="'New remote folder' | translate")
+            .fa.fa-fw.fas.fa-folder-plus
+        button.btn.btn-link.btn-sm.sftp-tool(type='button', (click)='upload()', [title]="'Send files to the server' | translate")
+            .fa.fa-fw.fas.fa-file-upload
+        button.btn.btn-link.btn-sm.sftp-tool(type='button', (click)='uploadFolder()', [title]="'Send a folder to the server' | translate")
+            .fa.fa-fw.fas.fa-file-import
 
 .sftp-filter-bar.d-flex.align-items-center(*ngIf='showFilter')
     input.form-control.form-control-sm.flex-grow-1(

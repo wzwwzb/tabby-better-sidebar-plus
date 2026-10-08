@@ -1,10 +1,12 @@
 import './sftpBrowser.component.scss'
 import { posix } from 'path'
 import { filesize } from 'filesize'
+import { Subscription, timer } from 'rxjs'
 import { AfterViewChecked, Component, ElementRef, HostListener, Inject, NgZone, OnDestroy, ViewChild } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { ConfigService, HTMLFileUpload, LocaleService, NotificationsService, PlatformService, PromptModalComponent } from 'tabby-core'
 import { SFTPContextMenuItemProvider, SFTPFile, SFTPPanelComponent } from 'tabby-ssh'
+import type { SSHTabComponent } from 'tabby-ssh'
 import { SidebarPlusEditorService } from '../editorLauncher.service'
 import { electronRemote } from '../electronRemote'
 import { EmptyFileUpload } from '../sftpLocalTransfer'
@@ -253,6 +255,7 @@ export class SidebarPlusSftpBrowserComponent extends SFTPPanelComponent implemen
         @Inject(SFTPContextMenuItemProvider) contextMenuProviders: SFTPContextMenuItemProvider[],
     ) {
         super(ngbModalService, notify, platform, contextMenuProviders)
+        this.followTerminalDirectory = this.config.store.sidebarPlus?.sftpFollowTerminalDirectory ?? true
         const transfers = new SftpTransfers(platform, notices, registry)
         this.fileTransfers = transfers
         this.platformSvc = platform
@@ -266,6 +269,14 @@ export class SidebarPlusSftpBrowserComponent extends SFTPPanelComponent implemen
     private readonly platformSvc: PlatformService
 
     private _sessionLabel: string|null = null
+    // 跟踪只对当前显示的面板运行，缓存面板隐藏时立即停止。
+    terminalSession: SSHTabComponent['session']|null = null
+    followTerminalDirectory = true
+    private panelIsActive = false
+    private terminalDirectorySubscription: Subscription|null = null
+    private checkingTerminalDirectory = false
+    private terminalNavigationInProgress = false
+    private unavailableTerminalDirectory: string|null = null
     /**
      * Display name of the SSH tab this panel serves, set by the host panel at
      * creation. Forwarded to the transfers helper, which stamps it on every
@@ -320,6 +331,7 @@ export class SidebarPlusSftpBrowserComponent extends SFTPPanelComponent implemen
         this.editor.dispose()
         this.dragOut.dispose()
         this.stopAutoRefresh()
+        this.stopTerminalDirectoryTracking()
         this.clearDropTarget()
         // The one listener this component puts on `document` — a panel torn
         // down mid-gesture would otherwise leave it there for good.
@@ -776,11 +788,161 @@ export class SidebarPlusSftpBrowserComponent extends SFTPPanelComponent implemen
      * longer describes.
      */
     override async navigate (newPath: string, fallbackOnError?: boolean): Promise<void> {
+        if (!this.terminalNavigationInProgress) {
+            this.unavailableTerminalDirectory = null
+        }
         if (newPath !== this.path) {
             this.clearSelection()
         }
         this.resetRenderChunk()
         await super.navigate(newPath, fallbackOnError)
+    }
+
+    get terminalDirectoryTrackingTitle (): string {
+        if (!this.followTerminalDirectory) {
+            return this.i18n.t('Follow terminal directory')
+        }
+        if (!this.terminalSession?.supportsWorkingDirectory()) {
+            return this.i18n.t('Waiting for the terminal to report its current directory.')
+        }
+        return this.i18n.t('Stop following terminal directory')
+    }
+
+    get breadcrumbTitle (): string {
+        return this.i18n.t('Double-click to edit the path. Right-click to copy the full path.')
+    }
+
+    toggleTerminalDirectoryTracking (): void {
+        this.followTerminalDirectory = !this.followTerminalDirectory
+        this.unavailableTerminalDirectory = null
+        this.saveTerminalDirectoryTrackingPreference()
+        if (this.followTerminalDirectory) {
+            this.startTerminalDirectoryTracking()
+        } else {
+            this.stopTerminalDirectoryTracking()
+        }
+    }
+
+    /** 用户手动选择面包屑路径时，先暂停终端目录跟踪。 */
+    navigateFromBreadcrumb (target: string, event?: MouseEvent): void {
+        event?.preventDefault()
+        event?.stopPropagation()
+        this.stopFollowingTerminalDirectory()
+        void this.navigate(target)
+    }
+
+    /** 将当前完整远程路径复制到系统剪贴板。 */
+    copyCurrentPath (event: MouseEvent): void {
+        event.preventDefault()
+        event.stopPropagation()
+        try {
+            this.platformSvc.setClipboard({ text: this.path })
+            this.notices.notice(this.i18n.t('Full remote path copied to clipboard.'))
+        } catch (error) {
+            this.notices.error(this.i18n.t('Could not copy the remote path.'), String(error))
+        }
+    }
+
+    override goUp (): void {
+        this.navigateFromBreadcrumb(posix.dirname(this.path))
+    }
+
+    override confirmPath (): void {
+        this.stopFollowingTerminalDirectory()
+        super.confirmPath()
+    }
+
+    setPanelActive (active: boolean): void {
+        if (this.panelIsActive === active) {
+            return
+        }
+        this.panelIsActive = active
+        if (active) {
+            this.startTerminalDirectoryTracking()
+        } else {
+            this.stopTerminalDirectoryTracking()
+        }
+    }
+
+    private startTerminalDirectoryTracking (): void {
+        this.stopTerminalDirectoryTracking()
+        if (!this.panelIsActive || !this.followTerminalDirectory || !this.terminalSession) {
+            return
+        }
+        this.terminalDirectorySubscription = timer(0, 1000).subscribe(() => {
+            void this.syncTerminalDirectory()
+        })
+    }
+
+    private stopTerminalDirectoryTracking (): void {
+        this.terminalDirectorySubscription?.unsubscribe()
+        this.terminalDirectorySubscription = null
+    }
+
+    private stopFollowingTerminalDirectory (): void {
+        if (!this.followTerminalDirectory) {
+            return
+        }
+        this.followTerminalDirectory = false
+        this.unavailableTerminalDirectory = null
+        this.saveTerminalDirectoryTrackingPreference()
+        this.stopTerminalDirectoryTracking()
+    }
+
+    /** 保存用户选择，避免手动导航或重启后恢复成默认跟踪状态。 */
+    private saveTerminalDirectoryTrackingPreference (): void {
+        this.config.store.sidebarPlus.sftpFollowTerminalDirectory = this.followTerminalDirectory
+        void this.config.save().catch(error => {
+            console.error('[tabby-better-sidebar-plus] Could not save terminal directory tracking preference.', error)
+        })
+    }
+
+    private async syncTerminalDirectory (): Promise<void> {
+        const terminal = this.terminalSession
+        if (
+            !this.panelIsActive
+            || !this.followTerminalDirectory
+            || !this.sftp
+            || !terminal?.supportsWorkingDirectory()
+            || this.checkingTerminalDirectory
+            || this.deleteInFlight
+            || this.editingPath !== null
+            || this.backgroundMenuOpen
+            || this.displayMenuOpen
+            || this.selection.size > 0
+            || this.hasActiveFilter
+        ) {
+            return
+        }
+        this.checkingTerminalDirectory = true
+        try {
+            const terminalPath = await terminal.getWorkingDirectory().catch(() => null)
+            if (
+                !terminalPath
+                || terminal !== this.terminalSession
+                || !this.panelIsActive
+                || !this.followTerminalDirectory
+            ) {
+                return
+            }
+            const target = posix.normalize(terminalPath)
+            if (
+                !posix.isAbsolute(target)
+                || target === this.path
+                || target === this.unavailableTerminalDirectory
+            ) {
+                return
+            }
+            this.terminalNavigationInProgress = true
+            this.unavailableTerminalDirectory = target
+            await this.navigate(target)
+            if (this.path === target) {
+                this.unavailableTerminalDirectory = null
+            }
+        } finally {
+            this.terminalNavigationInProgress = false
+            this.checkingTerminalDirectory = false
+        }
     }
 
     /**
@@ -859,6 +1021,7 @@ export class SidebarPlusSftpBrowserComponent extends SFTPPanelComponent implemen
     private async openEntry (item: SFTPFile, mode: OpenMode): Promise<void> {
         this.select(item)
         if (this.isDirectoryEntry(item)) {
+            this.stopFollowingTerminalDirectory()
             await this.navigate(item.fullPath)
             return
         }
@@ -877,6 +1040,7 @@ export class SidebarPlusSftpBrowserComponent extends SFTPPanelComponent implemen
             if (this.isDirectoryEntry(target)) {
                 // Navigation stays on the link's own path: that is the location
                 // the user asked for, and the server resolves it on its own.
+                this.stopFollowingTerminalDirectory()
                 await this.navigate(item.fullPath)
                 return
             }
@@ -2482,10 +2646,6 @@ export class SidebarPlusSftpBrowserComponent extends SFTPPanelComponent implemen
 
     get filterFoundNothing (): boolean {
         return this.fileList !== null && this.displayedFiles.length === 0 && this.hasActiveFilter
-    }
-
-    goRoot (): void {
-        void this.navigate('/')
     }
 
     get showColumnBorders (): boolean {

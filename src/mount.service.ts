@@ -6,6 +6,7 @@ import { checkHost } from './hostCompat'
 
 /** Set on `body` while Tabby's own transfers menu is to stay out of the way. */
 const HIDE_NATIVE_TRANSFERS_CLASS = 'sidebar-plus-hide-native-transfers'
+const HIDE_NATIVE_SFTP_BUTTON_CLASS = 'sidebar-plus-hide-native-sftp-button'
 
 @Injectable({ providedIn: 'root' })
 export class SidebarPlusMountService {
@@ -57,7 +58,7 @@ export class SidebarPlusMountService {
         // seconds, and this is exactly the kind of failure someone comes back
         // to diagnose later.
         console.error(
-            '[tabby-better-sidebar] Contrôle de compatibilité échoué :',
+            '[tabby-better-sidebar-plus] Contrôle de compatibilité échoué :',
             report.failed.map(p => p.id).join(', '),
             '— cette version de Tabby ne fournit plus ce que le plugin attend.',
         )
@@ -66,8 +67,8 @@ export class SidebarPlusMountService {
         // restriction alors que c'en est le contraire.
         this.notifications.error(
             report.fatal
-                ? 'tabby-better-sidebar ne peut pas démarrer sur cette version de Tabby — voir la console pour le détail'
-                : `tabby-better-sidebar : ${lost} — indisponible sur cette version de Tabby`,
+                ? 'tabby-better-sidebar-plus ne peut pas démarrer sur cette version de Tabby — voir la console pour le détail'
+                : `tabby-better-sidebar-plus : ${lost} — indisponible sur cette version de Tabby`,
         )
     }
 
@@ -91,6 +92,11 @@ export class SidebarPlusMountService {
         const panelShown = (sp?.showSftp ?? true) && (sp?.showTransfers ?? true)
         const hide = enabled && panelShown && (sp?.hideNativeTransfersMenu ?? true)
         document.body.classList.toggle(HIDE_NATIVE_TRANSFERS_CLASS, hide)
+
+        // 插件或 SFTP 页面关闭时恢复 Tabby 自带的入口。
+        const sftpShown = sp?.showSftp ?? true
+        const hideSftpButton = enabled && sftpShown && (sp?.hideNativeSftpButton ?? false)
+        document.body.classList.toggle(HIDE_NATIVE_SFTP_BUTTON_CLASS, hideSftpButton)
     }
 
     private mount (): void {
@@ -103,7 +109,7 @@ export class SidebarPlusMountService {
             // will not have called us. Reaching here means the container went
             // away *after* startup — nothing to say twice, but never a silent
             // return either.
-            console.error('[tabby-better-sidebar] Conteneur de montage introuvable, sidebar non montée.')
+            console.error('[tabby-better-sidebar-plus] Conteneur de montage introuvable, sidebar non montée.')
             return
         }
         this.componentRef = createComponent(SidebarPlusTreeComponent, {

@@ -24,3 +24,11 @@ body.sidebar-plus-hide-native-transfers {
         display: none !important;
     }
 }
+
+// 同时隐藏 Tabby 原生按钮和 SFTP+ 注入的工具栏替代按钮。
+body.sidebar-plus-hide-native-sftp-button terminal-toolbar button:has(> i.fa-folder-open),
+// 原生 SFTP 按钮紧跟在“重新连接”后，按 Tabby 当前工具栏顺序兜底匹配。
+body.sidebar-plus-hide-native-sftp-button terminal-toolbar > button:nth-of-type(2),
+body.sidebar-plus-hide-native-sftp-button button[data-tabby-sftp-plus-button="1"] {
+    display: none !important;
+}

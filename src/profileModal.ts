@@ -122,7 +122,7 @@ function computeVerdict (): ProfileModalVerdict {
     // The list of what *is* declared is the useful half: it is what tells a
     // rename from a removal, and it is not obtainable after the fact.
     console.error(
-        '[tabby-better-sidebar] EditProfileModalComponent ne déclare plus :',
+        '[tabby-better-sidebar-plus] EditProfileModalComponent ne déclare plus :',
         absent.join(', '),
         '— entrées réellement déclarées :',
         inputs.map(i => i.propName).join(', '),

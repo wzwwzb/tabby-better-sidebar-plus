@@ -65,7 +65,7 @@ function noteIfLive (returned: PartialProfileGroup<ProfileGroup>[], config: Conf
     }
     // No ids, no names: this repository is public and these are real entries.
     console.error(
-        '[tabby-better-sidebar] getProfileGroups() rend à nouveau des références vivantes de config.store.groups —',
+        '[tabby-better-sidebar-plus] getProfileGroups() rend à nouveau des références vivantes de config.store.groups —',
         shared, 'sur', live.length,
         '— le structuredClone() défensif (piège #12) redevient indispensable ; ne pas le retirer.',
     )

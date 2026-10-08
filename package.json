@@ -1,7 +1,7 @@
 {
-  "name": "tabby-better-sidebar",
-  "version": "1.0.5",
-  "description": "Enhanced connection sidebar for Tabby: a contextual SFTP browser inside the sidebar itself, pinned favorites, live connection status, active sessions, workspaces, SSH tunnels, drag & drop (including dragging remote files out to the OS), a transfer manager, and a custom icon picker.",
+  "name": "tabby-better-sidebar-plus",
+  "version": "2.0.1",
+  "description": "Independent fork of TooMuhtsh/tabby-better-sidebar for Tabby, adding Linux system information, persistent SFTP directory tracking, and SSH toolbar SFTP controls.",
   "keywords": [
     "tabby-plugin",
     "tabby",
@@ -37,11 +37,11 @@
   "typings": "dist/src/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/TooMuhtsh/tabby-better-sidebar.git"
+    "url": "git+https://github.com/wzwwzb/tabby-better-sidebar-plus.git"
   },
-  "homepage": "https://github.com/TooMuhtsh/tabby-better-sidebar#readme",
+  "homepage": "https://github.com/wzwwzb/tabby-better-sidebar-plus#readme",
   "bugs": {
-    "url": "https://github.com/TooMuhtsh/tabby-better-sidebar/issues"
+    "url": "https://github.com/wzwwzb/tabby-better-sidebar-plus/issues"
   },
   "scripts": {
     "build": "webpack --progress --color",
@@ -53,10 +53,12 @@
   },
   "files": [
     "dist",
+    "README.fr.md",
+    "README.zh-CN.md",
     "THIRD-PARTY-NOTICES.md",
     "CHANGELOG.md"
   ],
-  "author": "TooMuhtsh",
+  "author": "wzwwzb (fork of TooMuhtsh/tabby-better-sidebar)",
   "license": "MIT",
   "devDependencies": {
     "@angular/animations": "^15.0.0",

@@ -518,6 +518,7 @@ export class SidebarPlusSftpComponent implements OnInit, OnDestroy {
             // is what triggers the first change detection pass, and that is
             // where ngOnInit() reads `session` to open the SFTP channel.
             ref.instance.session = tab.sshSession!
+            ref.instance.terminalSession = tab.session
             // Same fallback rule as the sessions list: the user's own rename
             // first, then the profile, then the live title. Shown on the
             // transfer lines this panel starts, so they can say whose they are.
@@ -533,14 +534,14 @@ export class SidebarPlusSftpComponent implements OnInit, OnDestroy {
             if (path) {
                 ref.instance.path = path
             }
-            // Suppresses the panel's "working directory detection" tip banner,
-            // which needs a shell session we deliberately don't reach for here.
+            // 本侧栏使用自己的目录跟踪按钮，不显示 Tabby 原生 SFTP 提示。
             ref.instance.cwdDetectionAvailable = false
             ref.instance.closed.subscribe(() => this.closed.emit())
             this.panels.set(tab, ref)
         }
         this.appRef.attachView(ref.hostView)
         this.panelContainer.nativeElement.appendChild(this.rootNodeOf(ref))
+        ref.instance.setPanelActive(true)
     }
 
     /**
@@ -552,6 +553,7 @@ export class SidebarPlusSftpComponent implements OnInit, OnDestroy {
         if (!ref) {
             return
         }
+        ref.instance.setPanelActive(false)
         this.rootNodeOf(ref).remove()
         this.appRef.detachView(ref.hostView)
     }
@@ -563,6 +565,7 @@ export class SidebarPlusSftpComponent implements OnInit, OnDestroy {
     }
 
     private destroyPanel (ref: ComponentRef<SidebarPlusSftpBrowserComponent>): void {
+        ref.instance.setPanelActive(false)
         this.rootNodeOf(ref).remove()
         this.appRef.detachView(ref.hostView)
         ref.destroy()

@@ -1,0 +1,118 @@
+//- 按截图顺序排列系统状态、进程、网卡曲线和挂载点。
+.system-info-page.d-flex.flex-column.flex-grow-1
+    .system-info-toolbar.d-flex.align-items-center
+        .fa.fa-fw.fas.fa-server.me-2
+        span.system-info-host.me-auto.no-wrap(
+            [title]='sessionName || ("System information" | translate)'
+        ) {{ sessionName || ('System information' | translate) }}
+        span.system-info-state(*ngIf="status === 'live'") {{ 'Live' | translate }}
+        span.system-info-state.system-info-state-loading(*ngIf="status === 'connecting'") {{ 'Loading…' | translate }}
+
+    .system-info-placeholder(*ngIf="status === 'waiting'")
+        .fa.fa-fw.fas.fa-plug
+        strong {{ 'Waiting for an active SSH session.' | translate }}
+        span {{ 'Select an open SSH tab to view its Linux system information.' | translate }}
+
+    .system-info-placeholder(*ngIf="status === 'connecting'")
+        .system-info-loader(role='status')
+        span {{ 'Reading system information…' | translate }}
+
+    .system-info-placeholder.system-info-error(*ngIf="status === 'error'")
+        .fa.fa-fw.fas.fa-exclamation-circle
+        strong {{ message }}
+        span {{ 'Switch to another SSH tab, then return to this one to retry.' | translate }}
+
+    .system-info-content.flex-grow-1(*ngIf="status === 'live'")
+        .system-info-summary
+            span {{ uptimeLabel ? ('Uptime' | translate) + ': ' + uptimeLabel : '' }}
+            span.system-info-load(*ngIf='loadLabel') {{ ('Load' | translate) + ' ' + loadLabel }}
+
+        .system-info-meters(*ngIf='memory')
+            .system-info-meter
+                .system-info-meter-label CPU
+                .system-info-meter-bar([attr.aria-label]="('CPU usage' | translate) + ' ' + cpuPercent + '%'")
+                    .system-info-meter-fill.system-info-fill-cpu([style.width.%]='cpuPercent')
+                .system-info-meter-value {{ cpuPercent }}%
+            .system-info-meter
+                .system-info-meter-label {{ 'Memory' | translate }}
+                .system-info-meter-bar([attr.aria-label]="('Memory usage' | translate) + ' ' + memoryPercent + '%'")
+                    .system-info-meter-fill.system-info-fill-memory([style.width.%]='memoryPercent')
+                    span.system-info-meter-capacity {{ formatBytes(memory!.totalBytes - memory!.availableBytes) }}/{{ formatBytes(memory!.totalBytes) }}
+                .system-info-meter-value {{ memoryPercent }}%
+            .system-info-meter(*ngIf='memory!.swapTotalBytes > 0')
+                .system-info-meter-label {{ 'Swap' | translate }}
+                .system-info-meter-bar([attr.aria-label]="('Swap usage' | translate) + ' ' + swapPercent + '%'")
+                    .system-info-meter-fill.system-info-fill-swap([style.width.%]='swapPercent')
+                    span.system-info-meter-capacity {{ formatBytes(memory!.swapTotalBytes - memory!.swapFreeBytes) }}/{{ formatBytes(memory!.swapTotalBytes) }}
+                .system-info-meter-value {{ swapPercent }}%
+
+        .system-info-section.system-info-processes
+            .system-info-section-title {{ 'Top processes' | translate }}
+            .system-info-table-scroll
+                table.system-info-table
+                    thead
+                        tr
+                            th {{ 'Memory' | translate }}
+                            th {{ 'CPU' | translate }}
+                            th {{ 'Command' | translate }}
+                    tbody
+                        tr(*ngFor='let process of processes')
+                            td.system-info-number {{ formatBytes(process.memoryBytes) }}
+                            td.system-info-number {{ process.cpuPercent.toFixed(1) }}%
+                            td.system-info-command([title]='process.command') {{ process.command }}
+                        tr(*ngIf='!processes.length')
+                            td.system-info-empty-row(colspan='3') {{ 'No process data is available.' | translate }}
+
+        .system-info-section.system-info-network
+            .system-info-network-header.d-flex.align-items-center
+                .system-info-network-rate.system-info-rate-received
+                    span ▲
+                    span {{ formatBytes(selectedNetworkRate?.receivedBytesPerSecond ?? 0) }}/s
+                .system-info-network-rate.system-info-rate-sent
+                    span ▼
+                    span {{ formatBytes(selectedNetworkRate?.sentBytesPerSecond ?? 0) }}/s
+                label.system-info-interface.ms-auto([attr.aria-label]="'Network interface' | translate")
+                    select.form-control(
+                        [(ngModel)]='selectedInterface',
+                        (ngModelChange)='selectInterface($event)'
+                    )
+                        option(*ngFor='let name of interfaces', [ngValue]='name') {{ name }}
+            .system-info-chart(*ngIf='interfaces.length; else systemInfoNoNetwork')
+                .system-info-chart-scale
+                    span {{ formatBytes(networkScale) }}/s
+                    span {{ formatBytes(networkScale / 2) }}/s
+                    span 0
+                svg.system-info-chart-svg(viewBox='0 0 600 64', preserveAspectRatio='none', role='img', [attr.aria-label]="'Network traffic for {interface}' | translate: { interface: selectedInterface }")
+                    line.system-info-chart-grid(x1='0', y1='8', x2='600', y2='8')
+                    line.system-info-chart-grid(x1='0', y1='32', x2='600', y2='32')
+                    line.system-info-chart-grid(x1='0', y1='60', x2='600', y2='60')
+                    g(*ngFor='let point of networkPoints')
+                        rect.system-info-chart-bar.system-info-chart-received(
+                            [attr.x]='point.index * 10 + 1',
+                            [attr.y]='60 - point.receivedHeight',
+                            width='4',
+                            [attr.height]='point.receivedHeight'
+                        )
+                        rect.system-info-chart-bar.system-info-chart-sent(
+                            [attr.x]='point.index * 10 + 5',
+                            [attr.y]='60 - point.sentHeight',
+                            width='4',
+                            [attr.height]='point.sentHeight'
+                        )
+            ng-template(#systemInfoNoNetwork='')
+                .system-info-chart-empty {{ 'No network interfaces found.' | translate }}
+
+        .system-info-section.system-info-filesystems
+            .system-info-section-title {{ 'Filesystems' | translate }}
+            .system-info-table-scroll
+                table.system-info-table.system-info-filesystem-table
+                    thead
+                        tr
+                            th {{ 'Path' | translate }}
+                            th.system-info-filesystem-size {{ 'Available / size' | translate }}
+                    tbody
+                        tr(*ngFor='let filesystem of filesystems')
+                            td.system-info-command([title]='filesystem.path') {{ filesystem.path }}
+                            td.system-info-filesystem-size {{ formatBytes(filesystem.availableBytes) }}/{{ formatBytes(filesystem.totalBytes) }}
+                        tr(*ngIf='!filesystems.length')
+                            td.system-info-empty-row(colspan='2') {{ 'No local filesystem data is available.' | translate }}

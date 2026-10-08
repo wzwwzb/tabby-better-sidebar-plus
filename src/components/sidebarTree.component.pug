@@ -3,7 +3,7 @@
     //- when switching modes instead of sliding around under the cursor.
     .view-mode-bar.d-flex.align-items-center
         a.view-mode-tab(
-            [class.active]='!sftpMode',
+            [class.active]='!sftpMode && !systemInfoMode',
             (click)='setSftpMode(false)',
             [title]="'Profiles' | translate",
             href='#'
@@ -19,6 +19,15 @@
         )
             .fa.fa-fw.fas.fa-folder-open.me-1
             span SFTP
+        a.view-mode-tab(
+            *ngIf='showSystemInfo',
+            [class.active]='systemInfoMode',
+            (click)='setSystemInfoMode(true)',
+            [title]="'System information of the active SSH session' | translate",
+            href='#'
+        )
+            .fa.fa-fw.fas.fa-chart-line.me-1
+            span {{ 'System information' | translate }}
 
     //- Hidden outright when nothing is connected rather than shown empty: a
     //- permanently visible "aucune session" header would cost a line of the
@@ -31,7 +40,7 @@
     //- `flex-grow-1` in this flex column, so anything following it gets pushed
     //- to the very bottom of the sidebar in SFTP mode. The section is meant to
     //- sit at the top in both tabs.
-    .active-sessions(*ngIf='showActiveSessions && activeSessions.length')
+    .active-sessions(*ngIf='showActiveSessions && !systemInfoMode && activeSessions.length')
         a.active-sessions-header((click)='toggleActiveSessions()', href='#')
             .fa.fa-fw.fas.me-1(
                 [class.fa-chevron-down]='!activeSessionsCollapsed',
@@ -79,6 +88,12 @@
                         [title]="'Open the SFTP of this session' | translate"
                     )
                         .fa.fa-fw.fas.fa-folder-open
+                    .action(
+                        *ngIf='showSystemInfo',
+                        (click)='openSessionSystemInfo(session, $event)',
+                        [title]="'Open system information of this session' | translate"
+                    )
+                        .fa.fa-fw.fas.fa-chart-line
 
     //- Réengagement rapide sur les 5 derniers profils lancés, tous types
     //- confondus, jamais cloisonné par workspace — un lancement est un fait de
@@ -87,7 +102,7 @@
     //- encore chargé) est simplement sauté par recentProfiles, pas retiré de
     //- l'historique. Vue Profils seulement, comme les tunnels : la fiche parle
     //- de relance, pas de suivi de ce qui tourne.
-    .recent-profiles(*ngIf='showRecentProfiles && !sftpMode && recentProfiles.length')
+    .recent-profiles(*ngIf='showRecentProfiles && !sftpMode && !systemInfoMode && recentProfiles.length')
         a.active-sessions-header((click)='toggleRecentProfiles()', href='#')
             .fa.fa-fw.fas.me-1(
                 [class.fa-chevron-down]='!recentProfilesCollapsed',
@@ -116,7 +131,7 @@
     //- sessions block above, this one is hidden in SFTP mode: the user asked
     //- for it explicitly (2026-07-30), the SFTP tab having no use for the
     //- forwarding state.
-    .active-tunnels(*ngIf='showTunnels && !sftpMode && activeTunnels.length')
+    .active-tunnels(*ngIf='showTunnels && !sftpMode && !systemInfoMode && activeTunnels.length')
         a.active-sessions-header((click)='toggleActiveTunnels()', href='#')
             .fa.fa-fw.fas.me-1(
                 [class.fa-chevron-down]='!activeTunnelsCollapsed',
@@ -185,6 +200,8 @@
         (closed)='setSftpMode(false)'
     )
 
+    sidebar-plus-system-info.flex-grow-1(*ngIf='showSystemInfo && systemInfoMode')
+
     //- Placed *after* <sidebar-plus-sftp> precisely because the panel is
     //- flex-grow-1: anything following it is pushed to the very bottom, which
     //- is where this one belongs. It is the mirror image of the sessions block
@@ -199,7 +216,7 @@
     //- (workspaceSelectorMode, next to showWorkspaces in the settings tab),
     //- never auto-detected — see the getter's own comment in the .ts for why
     //- an earlier ResizeObserver-driven version was dropped.
-    .workspace-bar.d-flex.align-items-center.flex-wrap(*ngIf='showWorkspaces && !sftpMode && workspaceSelectorMode === "tabs"')
+    .workspace-bar.d-flex.align-items-center.flex-wrap(*ngIf='showWorkspaces && !sftpMode && !systemInfoMode && workspaceSelectorMode === "tabs"')
         a.workspace-tab(
             [class.active]='activeWorkspaceId === "all"',
             (click)='selectWorkspace("all")',
@@ -230,7 +247,7 @@
     //- (same icon/dot rendering a tab would use), the full list lives in the
     //- popup opened by openWorkspaceSwitcher() below.
     a.workspace-bar-compact.d-flex.align-items-center(
-        *ngIf='showWorkspaces && !sftpMode && workspaceSelectorMode === "dropdown"',
+        *ngIf='showWorkspaces && !sftpMode && !systemInfoMode && workspaceSelectorMode === "dropdown"',
         (click)='openWorkspaceSwitcher($event)',
         [title]="activeWorkspace?.name ?? ('All' | translate)",
         href='#'
@@ -240,7 +257,7 @@
         .workspace-color-dot(*ngIf='activeWorkspace?.color', [style.background-color]='activeWorkspace?.color')
         .fa.fa-fw.fas.fa-chevron-down.ms-1
 
-    .d-flex.align-items-center.gap-1.mb-1(*ngIf='showFilter && !sftpMode')
+    .d-flex.align-items-center.gap-1.mb-1(*ngIf='showFilter && !sftpMode && !systemInfoMode')
         //- `#filterInput=''`, not `#filterInput`: in pug a leading `#` is id
             syntax, so an Angular template reference has to be written as a
             quoted attribute to survive compilation. Read by @ViewChild.
@@ -265,7 +282,7 @@
     //- from one profile on: the count is the only statement of how many rows
     //- are held, since the rows themselves may have scrolled out of sight.
     //- Doubles as the transient confirmation once a move lands.
-    .selection-bar(*ngIf='(selectionActive || selectionNotice) && !sftpMode')
+    .selection-bar(*ngIf='(selectionActive || selectionNotice) && !sftpMode && !systemInfoMode')
         .d-flex.align-items-center(*ngIf='selectionNotice')
             .fa.fa-fw.fas.fa-check.me-2
             span.me-auto {{ selectionNotice }}
@@ -276,7 +293,7 @@
                     .fa.fa-fw.fas.fa-xmark
             .selection-hint {{ 'Drag the selection, or right-click the destination folder' | translate }}
 
-    .hidden-items-panel(*ngIf='showHiddenPanel && !sftpMode')
+    .hidden-items-panel(*ngIf='showHiddenPanel && !sftpMode && !systemInfoMode')
         .text-muted.small(*ngIf='!hiddenGroupsInWorkspace.length && !hiddenProfilesInWorkspace.length') {{ 'No hidden items in this workspace.' | translate }}
         .hidden-item(*ngFor='let g of hiddenGroupsInWorkspace')
             profile-icon.me-2([icon]='g.icon ?? "far fa-folder"', [color]='g.color')
@@ -289,7 +306,7 @@
             a.action((click)='restoreProfileInWorkspace(p)', [title]="'Show again' | translate", href='#')
                 .fa.fa-fw.fas.fa-eye
 
-    .sidebar-plus-tree.h-100(*ngIf='!showHiddenPanel && !sftpMode', (contextmenu)='onSidebarContextMenu($event)')
+    .sidebar-plus-tree.h-100(*ngIf='!showHiddenPanel && !sftpMode && !systemInfoMode', (contextmenu)='onSidebarContextMenu($event)')
         .d-flex.flex-column.p-2.sidebar-plus-tree-container(
             cdkDropList,
             id='groups-root',
@@ -911,13 +928,13 @@
             (click)='openExternalLink(repositoryUrl, $event)',
             [title]="'Open the project repository' | translate",
             href='#'
-        ) better-sidebar
+        ) better-sidebar-plus
         span.footer-by  by
         a.footer-by-author(
             (click)='openExternalLink(authorUrl, $event)',
             [title]="'Open the author profile on GitHub' | translate",
             href='#'
-        ) TooMuhtsh
+        ) wzwwzb
         span.footer-version v{{ pluginVersion }}
     a.sidebar-plus-gear(
         (click)='openPluginSettings()',

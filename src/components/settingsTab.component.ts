@@ -122,6 +122,12 @@ export class SidebarPlusSettingsTabComponent {
     get lblSftp (): string { return this.i18n.t('SFTP view') }
     get lblSftpHint (): string { return this.i18n.t('One SFTP channel per session actually browsed.') }
     get lblSftpDesc (): string { return this.i18n.t('The SFTP tab of the sidebar and its panel.') }
+    get lblHideNativeSftpButton (): string { return this.i18n.t('Hide the SFTP buttons in the SSH toolbar') }
+    get lblHideNativeSftpButtonHint (): string { return this.i18n.t('Hides Tabby\'s native button and the SFTP+ button, if installed.') }
+    get lblHideNativeSftpButtonDesc (): string { return this.i18n.t('The plugin SFTP view in the sidebar remains available.') }
+    get lblSystemInformation (): string { return this.i18n.t('System information') }
+    get lblSystemInformationHint (): string { return this.i18n.t('Reads Linux performance and filesystem statistics over SSH.') }
+    get lblSystemInformationDesc (): string { return this.i18n.t('CPU, memory, processes, network traffic and local filesystems.') }
     get lblEditor (): string { return this.i18n.t('Remote file editor') }
     get lblEditorHint (): string { return this.i18n.t('The file is copied, edited, then sent back to the server.') }
     get lblEditorDesc (): string { return this.i18n.t('Program opened on double-click. Empty, Windows decides.') }
@@ -330,6 +336,15 @@ export class SidebarPlusSettingsTabComponent {
      */
     async setHideNativeTransfersMenu (value: boolean): Promise<void> {
         this.config.store.sidebarPlus.hideNativeTransfersMenu = value
+        await this.config.save()
+    }
+
+    get hideNativeSftpButton (): boolean {
+        return this.config.store.sidebarPlus?.hideNativeSftpButton ?? false
+    }
+
+    async setHideNativeSftpButton (value: boolean): Promise<void> {
+        this.config.store.sidebarPlus.hideNativeSftpButton = value
         await this.config.save()
     }
 

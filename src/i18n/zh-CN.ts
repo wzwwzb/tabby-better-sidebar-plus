@@ -5,6 +5,48 @@
  * Plurals only carry the `other` category: Chinese has no grammatical number.
  */
 const zh_CN: Record<string, string> = {
+    // sftpBrowser.component.pug — 终端目录跟踪按钮。
+    'Follow terminal directory': '跟踪终端目录',
+    'Stop following terminal directory': '停止跟踪终端目录',
+    'Waiting for the terminal to report its current directory.': '等待终端报告当前目录。',
+    'Double-click to edit the path. Right-click to copy the full path.': '双击可编辑路径，右击可复制完整路径。',
+    'Full remote path copied to clipboard.': '已复制完整远程路径。',
+    'Could not copy the remote path.': '无法复制远程路径。',
+
+    // systemInfo.component.ts — 系统信息面板。
+    'Active SSH session': '活动 SSH 会话',
+    'System information': '系统信息',
+    'System information of the active SSH session': '当前 SSH 会话的系统信息',
+    'Open system information of this session': '查看此会话的系统信息',
+    'Live': '实时',
+    'Loading…': '正在加载…',
+    'Select an open SSH tab to view its Linux system information.': '选择一个已连接的 SSH 标签页以查看 Linux 系统信息。',
+    'Reading system information…': '正在读取系统信息…',
+    'Uptime': '运行时间',
+    'Load': '负载',
+    'CPU': 'CPU',
+    'CPU usage': 'CPU 使用率',
+    'Memory': '内存',
+    'Memory usage': '内存使用率',
+    'Swap': '交换空间',
+    'Swap usage': '交换空间使用率',
+    'Top processes': '占用最高的进程',
+    'No process data is available.': '没有可用的进程信息。',
+    'Network interface': '网络接口',
+    'Network traffic for {interface}': '网络接口 {interface} 的流量',
+    'No network interfaces found.': '未发现网络接口。',
+    'Filesystems': '文件系统',
+    'Path': '路径',
+    'Available / size': '可用空间 / 总大小',
+    'No local filesystem data is available.': '没有可用的本地文件系统信息。',
+    'The remote system monitor stopped.': '远程系统监控已停止。',
+    'This SSH server does not allow remote commands.': '此 SSH 服务器不允许执行远程命令。',
+    'System information is available for Linux SSH servers only.': '系统信息目前只支持 Linux SSH 服务器。',
+    'The remote system returned unreadable statistics.': '远程系统返回了无法读取的统计信息。',
+    'Switch to another SSH tab, then return to this one to retry.': '切换到其他 SSH 标签页，再切回此页面重试。',
+    'Reads Linux performance and filesystem statistics over SSH.': '通过 SSH 读取 Linux 性能及文件系统统计信息。',
+    'CPU, memory, processes, network traffic and local filesystems.': 'CPU、内存、进程、网络流量和本地文件系统。',
+
     // sftpPanel.component.ts — header line, auto-return-to-Profiles notices
     'SSH session lost ({tab}) — back to Profiles view': 'SSH 会话已断开（{tab}）——返回配置视图',
     'SSH session lost — back to Profiles view': 'SSH 会话已断开——返回配置视图',
@@ -129,7 +171,6 @@ const zh_CN: Record<string, string> = {
     'Symbolic link': '符号链接',
 
     // sftpBrowser.component.pug — toolbar
-    'Double-click to type a path': '双击以输入路径',
     'Type the path by hand': '手动输入路径',
     'Refresh': '刷新',
     'Filter the list': '过滤列表',
@@ -420,6 +461,9 @@ const zh_CN: Record<string, string> = {
     'Hide the Tabby transfers menu': '隐藏 Tabby 的传输菜单',
     'Otherwise the native Tabby menu opens on every transfer.': '否则每次传输时 Tabby 原生菜单都会弹出。',
     'The sidebar panel already shows the same transfers.': '侧边栏面板已经显示了相同的传输。',
+    'Hide the SFTP buttons in the SSH toolbar': '隐藏 SSH 工具栏中的 SFTP 按钮',
+    'Hides Tabby\'s native button and the SFTP+ button, if installed.': '同时隐藏 Tabby 自带的按钮，以及已安装时的 SFTP+ 按钮。',
+    'The plugin SFTP view in the sidebar remains available.': '侧边栏插件自己的 SFTP 页面仍可使用。',
 
     // settingsTab.component.ts — features page
     'Each block switches on independently. Nothing is deleted by turning one off.': '每个区块独立开关。关闭某个区块不会删除任何内容。',

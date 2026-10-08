@@ -104,7 +104,7 @@ export class SidebarPlusI18nService {
         } catch (e) {
             // A table that fails to load leaves English in place: degraded
             // but usable. Nothing here justifies breaking Tabby.
-            console.warn(`[tabby-better-sidebar] could not register ${lang} translations`, e)
+            console.warn(`[tabby-better-sidebar-plus] could not register ${lang} translations`, e)
         }
     }
 

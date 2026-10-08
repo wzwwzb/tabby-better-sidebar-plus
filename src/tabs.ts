@@ -23,7 +23,7 @@ export function isSSHTab (tab: BaseTabComponent): tab is SSHTabComponent {
     }
     if (tab?.constructor?.name === 'SSHTabComponent' && noteIdentityMismatch('SSHTabComponent')) {
         console.warn(
-            '[tabby-better-sidebar] Un onglet SSHTabComponent ne passe pas son `instanceof` : ' +
+            '[tabby-better-sidebar-plus] Un onglet SSHTabComponent ne passe pas son `instanceof` : ' +
             'deux copies de tabby-ssh sont chargées (voir AI-CONTEXT, piège #34). ' +
             'Sessions actives, SFTP et tunnels resteront vides.',
         )

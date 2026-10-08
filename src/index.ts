@@ -8,6 +8,7 @@ import { SettingsTabProvider } from 'tabby-settings'
 import { SidebarPlusTreeComponent } from './components/sidebarTree.component'
 import { SidebarPlusSftpComponent } from './components/sftpPanel.component'
 import { SidebarPlusSftpBrowserComponent } from './components/sftpBrowser.component'
+import { SidebarPlusSystemInfoComponent } from './components/systemInfo.component'
 import { ConfirmModalComponent } from './components/confirmModal.component'
 import { SnippetsModalComponent } from './components/snippetsModal.component'
 import { NoteModalComponent } from './components/noteModal.component'
@@ -54,6 +55,7 @@ const SIDEBAR_PANEL_CONTRIBUTION: BetterPanelContribution = {
         SidebarPlusTreeComponent,
         SidebarPlusSftpComponent,
         SidebarPlusSftpBrowserComponent,
+        SidebarPlusSystemInfoComponent,
         ConfirmModalComponent,
         SnippetsModalComponent,
         NoteModalComponent,

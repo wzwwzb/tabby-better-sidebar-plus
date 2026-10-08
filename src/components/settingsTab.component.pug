@@ -190,7 +190,29 @@
             (ngModelChange)="setBlock('showSftp', $event)"
           )
 
+      .form-line.block-switch
+        .header
+          .title {{ lblSystemInformation }} #[i.fas.fa-info-circle.info-hint([title]='lblSystemInformationHint')]
+          .description {{ lblSystemInformationDesc }}
+          .description.text-warning(*ngIf="!hostHas('ssh-tab')") {{ lblUnavailable }}
+        .control
+          toggle(
+            [ngModel]="blockOn('showSystemInfo', 'ssh-tab')",
+            [disabled]="!hostHas('ssh-tab')",
+            (ngModelChange)="setBlock('showSystemInfo', $event)"
+          )
+
       .block-options(*ngIf="blockOn('showSftp', 'sftp-panel')")
+        .form-line
+          .header
+            .title {{ lblHideNativeSftpButton }} #[i.fas.fa-info-circle.info-hint([title]='lblHideNativeSftpButtonHint')]
+            .description {{ lblHideNativeSftpButtonDesc }}
+          .control
+            toggle(
+              [ngModel]='hideNativeSftpButton',
+              (ngModelChange)='setHideNativeSftpButton($event)'
+            )
+
         //- `stacked` : le chemin passe sous son intitulé et prend toute la largeur.
             Sur la même ligne que les deux boutons, il ne restait au champ que
             quelques caractères visibles — un chemin d'exécutable n'y tenait pas.

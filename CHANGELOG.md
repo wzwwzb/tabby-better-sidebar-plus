@@ -1,7 +1,17 @@
 # Changelog
 
-All notable changes to `tabby-better-sidebar` are documented here, one entry
-per npm release. Dates are the npm publication dates.
+This fork is published as `tabby-better-sidebar-plus` and starts from upstream
+`tabby-better-sidebar` 1.0.5. The 1.x entries below are inherited upstream
+history; 2.x entries track this fork.
+
+## 2.0.1 — Unreleased
+
+- **Forked** from TooMuhtsh/tabby-better-sidebar; the inherited upstream
+  release history follows below.
+- **Added** the Linux system-information view, persistent SFTP terminal-directory
+  tracking, and settings to hide SFTP toolbar buttons.
+- **Changed** the package name, repository links and sidebar footer branding to
+  tabby-better-sidebar-plus by wzwwzb.
 
 ## 1.0.5 — 2026-09-24
 

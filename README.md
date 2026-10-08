@@ -1,25 +1,43 @@
 <div align="center">
 
-# 📁 tabby-better-sidebar
+# 📁 tabby-better-sidebar-plus
 
 **Enhanced connection sidebar for [Tabby](https://tabby.sh)** — pinned
 favourites, live connection status, drag & drop, and a contextual SFTP browser
 living *inside* the sidebar rather than in a separate docked panel.
 
-**English** · [Français](README.fr.md)
+**English** · [Français](README.fr.md) · [简体中文](README.zh-CN.md)
 
-[![License: MIT](https://img.shields.io/github/license/TooMuhtsh/tabby-better-sidebar?color=0d9488)](LICENSE)
-[![Part of Better Tabby](https://img.shields.io/badge/part%20of-Better%20Tabby-0d9488)](#-better-tabby-the-plugin-family)
+[![License: MIT](https://img.shields.io/github/license/wzwwzb/tabby-better-sidebar-plus?color=0d9488)](LICENSE)
+[![Better Tabby compatible](https://img.shields.io/badge/Better%20Tabby-compatible-0d9488)](#-better-tabby-compatibility)
 
 </div>
 
 ---
 
+## Fork provenance and additions
+
+This repository is an independent fork of
+[TooMuhtsh/tabby-better-sidebar](https://github.com/TooMuhtsh/tabby-better-sidebar).
+The original sidebar and its existing feature set come from that upstream
+project; this fork retains that work and adds:
+
+- A Linux system-information view for SSH sessions.
+- Optional SFTP tracking of the terminal's current directory, with the user's
+  choice remembered across restarts.
+- A setting to hide Tabby's native SFTP toolbar button and the SFTP+ replacement
+  button, when that plugin is installed.
+
+The upstream MIT license and third-party notices are retained. This fork is
+maintained independently and is not an official upstream release.
+
+**Compatibility:** We do not recommend enabling this fork alongside the
+upstream `tabby-better-sidebar` plugin because their sidebar and SFTP controls
+overlap.
+
 Tabby ships a native profile sidebar, but it is not exported for third-party
-plugins to reuse. This plugin rebuilds it and adds pinned favourites, live
-connection status, drag & drop across folders, named workspaces, SSH tunnel
-management, snippets, notes, and a full SFTP browser that lives in the
-sidebar's own space and follows whichever SSH tab has focus.
+plugins to reuse. The upstream project reconstructs it; this fork keeps that
+base and the features described below.
 
 **Every block is independent, and each one can be switched off** from the
 plugin's settings tab — if you never use SSH tunnels or workspaces, turn those
@@ -27,22 +45,22 @@ two off and the sidebar gets that much lighter. Nothing is deleted when you do:
 your favourites, workspaces and snippets stay exactly where they are, they just
 stop being displayed.
 
-## 🧩 Better Tabby, the plugin family
+## 🧩 Better Tabby compatibility
 
-This plugin is one half of **Better Tabby**, a small family of independent
-plugins that happen to share one settings tab instead of scattering several:
+This fork retains the integration contract used by the upstream
+[tabby-better-vault](https://github.com/TooMuhtsh/tabby-better-vault) plugin to
+share a single **Better Tabby** settings tab. The projects remain independent:
+neither requires the other, with no shared code or npm dependency.
 
 | | Plugin | Adds |
 |---|---|---|
-| 📁 | **tabby-better-sidebar** *(this repo)* | Pinned favourites, live connection status, drag & drop, workspaces, contextual SFTP browser |
+| 📁 | **tabby-better-sidebar-plus** *(this fork)* | Pinned favourites, live connection status, drag & drop, workspaces, contextual SFTP browser |
 | 🔐 | **[tabby-better-vault](https://github.com/TooMuhtsh/tabby-better-vault)** | Automatic vault unlock via your OS keychain |
 
-**Neither plugin requires the other.** Install just this one and it behaves
-exactly as if the other didn't exist — its own settings tab, nothing shared.
-Install both, and they elect one of themselves to host a single **Better
-Tabby** tab, each still rendering its own page inside it. No npm dependency
-between the two repos, no shared code: just a small string contract
-(`BetterPanelContribution:<id>`) each plugin recognises independently.
+When both are installed, they elect one plugin to host the shared tab and each
+renders its own settings page inside it. Install either one alone and it keeps
+its own settings tab. The integration is only the small string contract
+(`BetterPanelContribution:<id>`); there is no shared code or npm dependency.
 
 ## ✨ The profile tree
 
@@ -52,6 +70,8 @@ between the two repos, no shared code: just a small string contract
   measures the delay you actually feel when typing
 - **Active sessions** section at the top, one row per pane rather than per tab,
   with uptime, a click to focus and a shortcut to that session's SFTP view
+- **System information** follows the focused SSH session and shows live Linux
+  CPU, memory, swap, processes, per-interface network rates and local filesystems
 - **Recent profiles** — the five most recently launched, all types together
   (off by default)
 - **Drag & drop** reordering — profiles and folders, including moving a profile
@@ -97,6 +117,13 @@ separate bundle, so they cost nothing at startup.
 The browser replaces the profile tree in the sidebar's own space and follows
 whichever SSH tab has focus — each tab remembers where it was, and the view can
 be **frozen** on one session so it stops following the focused tab.
+An optional toolbar button follows the terminal's reported working directory;
+turn it off to browse independently. The remote shell must report its current path.
+
+When directory tracking is on, it also follows the terminal's current working
+directory. The crosshair button beside Refresh switches tracking on or off.
+Choosing a breadcrumb pauses tracking so the selected folder stays open;
+right-clicking the breadcrumb copies the complete remote path.
 
 - **Configurable columns** (size, date, octal and long permissions, type,
   extension), folders-first sorting, hidden files toggle, zebra striping
@@ -120,6 +147,15 @@ be **frozen** on one session so it stops following the focused tab.
   land whole, cancel confirmation, visible from both views, hidden when empty
 - **Optional auto-refresh** of the listing, off by default
 - **Auto-return** to the profile view once no tab has an active SFTP session
+
+## 🖥️ System information
+
+The sidebar view follows the focused SSH session. It shows Linux uptime and load,
+CPU and memory use, swap, the busiest processes, a short history of network
+traffic per interface, and mounted local filesystems. It refreshes every two
+seconds and runs as a read-only SSH command on a separate channel, without
+installing a remote agent or writing into the interactive terminal. Linux
+`/proc`, `ps` and `df` are required.
 
 ## 📝 Snippets, notes and sharing
 
@@ -152,9 +188,9 @@ settings tab. Any other locale falls back to English.
 ## 📦 Installation
 
 **Requires Tabby 1.0.231 or newer** — developed and tested against **Tabby
-1.0.235**, the current stable release.
+1.0.235**.
 
-In Tabby, open **Settings → Plugins**, search for `better-sidebar` and install
+In Tabby, open **Settings → Plugins**, search for `better-sidebar-plus` and install
 it, then restart Tabby completely.
 
 <details>
@@ -163,7 +199,7 @@ it, then restart Tabby completely.
 ```bash
 # In Tabby's plugin directory: %APPDATA%\tabby\plugins on Windows,
 # ~/.config/tabby/plugins on macOS/Linux
-npm install tabby-better-sidebar
+npm install tabby-better-sidebar-plus
 ```
 
 Then restart Tabby completely.
@@ -191,6 +227,7 @@ Tabby's own `config.yaml`.
 | `showWorkspaces` | `true` | Workspace bar above the list |
 | `showFilter` | `true` | Search field and its shortcut |
 | `showSftp` | `true` | The SFTP tab of the sidebar and its panel |
+| `showSystemInfo` | `true` | The Linux system information tab of the sidebar |
 | `showTransfers` | `true` | Transfer manager at the bottom of the sidebar |
 | `showSnippets` | `true` | The *Snippets* entry of the right click and its tab |
 | `showNotes` | `true` | The *note* entry of the right click and its badge |
@@ -203,10 +240,12 @@ latency probe, no transfer tracking for a panel nobody is looking at.
 | Setting | Default | Effect |
 |---|---|---|
 | `hideNativeTransfersMenu` | `true` | Hides Tabby's own transfers menu, which shows the same transfers |
+| `hideNativeSftpButton` | `false` | Hides Tabby's built-in and SFTP+ buttons from SSH terminal toolbars |
 | `workspaceSelectorMode` | `tabs` | Workspace bar as tabs, or as a dropdown list |
 | `pingIntervalSeconds` | `0` | Latency probe interval; `0` disables it |
 | `sftpAutoRefreshSeconds` | `0` | Re-reads the current folder on a cycle; `0` disables it |
 | `sftpAutoReturnToProfiles` | `true` | Returns to the profile view when no SSH session is open any more |
+| `sftpFollowTerminalDirectory` | `true` | Remembers whether the SFTP view follows the terminal's current directory |
 | `sftpEditorPath` | *(empty)* | Program opened on double-click. Empty, Windows decides |
 | `sftpDeleteDefaultButton` | `cancel` | Which button <kbd>Enter</kbd> activates in the SFTP delete confirmation |
 | `sftpDragOutFolders` | `false` | Allows dragging a *folder* out to the OS, not just a file |
@@ -240,8 +279,8 @@ deletes them.
 ## 🛠️ Development
 
 ```bash
-git clone https://github.com/TooMuhtsh/tabby-better-sidebar
-cd tabby-better-sidebar
+git clone https://github.com/wzwwzb/tabby-better-sidebar-plus
+cd tabby-better-sidebar-plus
 npm install --ignore-scripts   # avoids postinstall steps that build native code needlessly here
 npm run watch
 ```
@@ -250,7 +289,7 @@ Then, with Tabby closed, link the folder into Tabby's plugin directory. Do not
 use the `TABBY_PLUGINS` environment variable — it is broken on Windows:
 
 ```powershell
-New-Item -ItemType Junction -Path "$env:APPDATA\tabby\plugins\node_modules\tabby-better-sidebar" -Target "<path-to-this-folder>"
+New-Item -ItemType Junction -Path "$env:APPDATA\tabby\plugins\node_modules\tabby-better-sidebar-plus" -Target "<path-to-this-folder>"
 ```
 
 Restart Tabby completely after any rebuild — reloading the window is not enough,
@@ -259,13 +298,11 @@ since Tabby's plugin loader state is global to the process.
 ## Related
 
 [**tabby-better-vault**](https://github.com/TooMuhtsh/tabby-better-vault) — the
-sibling plugin, see [Better Tabby](#-better-tabby-the-plugin-family) above.
+upstream companion plugin, see [Better Tabby compatibility](#-better-tabby-compatibility) above.
 
-[**AI governance docs**](https://toomuhtsh.github.io/tabby-better-sidebar/.AIRules/README.html) —
-this plugin is developed with an AI assistant under a written governance
-charter, and the full working dossier is public: invariants and numbered
-pitfalls, development journal, roadmap and a register of everything delivered,
-browsable as a small static site.
+[**Upstream AI governance docs**](https://toomuhtsh.github.io/tabby-better-sidebar/.AIRules/README.html) —
+the original project publishes its development charter, invariants, journal,
+roadmap and delivery register as a small static site.
 
 ## Credits
 
