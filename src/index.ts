@@ -15,6 +15,7 @@ import { NoteModalComponent } from './components/noteModal.component'
 import { PasteGroupModalComponent } from './components/pasteGroupModal.component'
 import { TunnelsModalComponent } from './components/tunnelsModal.component'
 import { IconPickerModalComponent } from './components/iconPickerModal.component'
+import { SftpTextEditorModalComponent } from './components/sftpTextEditorModal.component'
 import { SidebarPlusHostPanelComponent } from './components/hostPanel.component'
 import { SidebarPlusSettingsTabComponent } from './components/settingsTab.component'
 import { SidebarPlusTransfersComponent } from './components/transfers.component'
@@ -59,6 +60,7 @@ const SIDEBAR_PANEL_CONTRIBUTION: BetterPanelContribution = {
         ConfirmModalComponent,
         SnippetsModalComponent,
         NoteModalComponent,
+        SftpTextEditorModalComponent,
         PasteGroupModalComponent,
         TunnelsModalComponent,
         IconPickerModalComponent,

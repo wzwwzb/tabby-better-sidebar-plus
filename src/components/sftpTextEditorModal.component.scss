@@ -1,0 +1,14 @@
+.remote-text-editor-path {
+    overflow-wrap: anywhere;
+}
+
+.remote-text-editor-hint {
+    white-space: normal;
+}
+
+.remote-text-editor-field {
+    min-height: 58vh;
+    resize: vertical;
+    font-family: var(--font-family-monospace, monospace);
+    tab-size: 4;
+}

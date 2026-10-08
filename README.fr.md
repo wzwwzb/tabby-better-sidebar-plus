@@ -138,12 +138,15 @@ du terminal. Le bouton de ciblage à côté d'Actualiser active ou désactive ce
 - **Sélection multiple**, fichiers *et* dossiers, pour supprimer ou déplacer par
   lot
 - **Chargement par blocs** des listings volumineux
-- **Le double-clic ouvre un fichier dans un éditeur de code**, jamais via
-  l'association de fichiers du système — double-cliquer un exécutable l'édite au
-  lieu de le lancer. L'enregistrement renvoie le fichier automatiquement, après
-  avoir vérifié que la copie distante n'a pas changé entre-temps, et restaure
-  ses permissions. Les liens symboliques sont résolus : c'est la cible qui est
-  éditée, pas le lien
+- **Le double-clic ouvre le texte UTF-8 dans l'éditeur intégré à Tabby par
+  défaut**, sans lancer un éditeur externe ni afficher de dialogue de
+  téléchargement. L'enregistrement vérifie les changements distants et
+  conserve le BOM, les fins de ligne et les permissions. Un réglage permet de
+  privilégier l'éditeur système configuré ; **Ouvrir avec…** reste disponible
+  ponctuellement dans le menu contextuel. L'éditeur intégré accepte le texte
+  UTF-8 jusqu'à 2 Mio ; utilisez l'éditeur système pour les fichiers binaires,
+  d'un autre encodage ou plus volumineux. Les liens symboliques sont résolus :
+  c'est la cible qui est éditée, pas le lien
 - **« Ouvrir avec… »** reste disponible, mais seulement depuis le menu contextuel
 - **Créer, renommer et supprimer** des entrées — touche `Suppr` comprise, avec
   une confirmation HTML dont vous choisissez le bouton par défaut dans les
@@ -262,7 +265,8 @@ personne ne regarde.
 | `sftpAutoRefreshSeconds` | `0` | Relit le dossier courant à intervalle régulier ; `0` désactive |
 | `sftpAutoReturnToProfiles` | `true` | Revient à la vue Profils quand plus aucune session SSH n'est ouverte |
 | `sftpFollowTerminalDirectory` | `true` | Mémorise si la vue SFTP suit le dossier courant du terminal |
-| `sftpEditorPath` | *(vide)* | Programme ouvert au double-clic. Vide, Windows décide |
+| `sftpPreferSystemEditor` | `false` | Utilise l'éditeur système configuré au lieu de l'éditeur intégré ; les anciens chemins d'éditeur configurés conservent le comportement précédent |
+| `sftpEditorPath` | *(vide)* | Chemin du programme utilisé en mode éditeur système |
 | `sftpDeleteDefaultButton` | `cancel` | Bouton activé par <kbd>Entrée</kbd> dans la confirmation de suppression SFTP |
 | `sftpDragOutFolders` | `false` | Autorise le glisser d'un *dossier* vers le système, et pas seulement d'un fichier |
 | `sftpColumns` | `size`, `date`, `mode` | Colonnes affichées dans le listing SFTP |
@@ -278,6 +282,8 @@ réglages : rien de ce qui précède ne les supprime.
 </details>
 
 ## ⚠️ Limites connues
+
+- **L'éditeur intégré traite le texte UTF-8 jusqu'à 2 Mio.** Pour les fichiers plus grands, binaires ou d'un autre encodage, utilisez le mode éditeur système ou « Ouvrir avec… ».
 
 - **L'édition distante ne verrouille rien.** Le plugin vérifie que le fichier
   distant n'a pas changé avant de renvoyer votre modification, et refuse

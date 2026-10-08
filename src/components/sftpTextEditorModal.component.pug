@@ -1,0 +1,29 @@
+.modal-header
+    h5.modal-title.no-wrap {{ 'Edit remote text file' | translate }}: {{ fileName }}
+    button.btn-close([disabled]='saving', (click)='cancel()')
+
+.modal-body
+    .remote-text-editor-path.text-muted.small.mb-2([title]='remotePath') {{ remotePath }}
+    .remote-text-editor-hint.text-muted.small.mb-2 {{ 'UTF-8 text only; files larger than {size} are not supported.' | translate:{ size: '2 MiB' } }}
+    textarea.form-control.remote-text-editor-field(
+        #field,
+        [(ngModel)]='text',
+        [readonly]='saving',
+        spellcheck='false',
+        autocomplete='off',
+        autocapitalize='off',
+        wrap='off',
+        (keydown)='onKeydown($event)'
+    )
+    .text-warning.small.mt-2(*ngIf='dirty') {{ 'Unsaved changes' | translate }}
+    .text-danger.small.mt-2(*ngIf='saveFailed') {{ 'Could not save to the server. Check the notification and try again.' | translate }}
+
+.modal-footer
+    button.btn.btn-secondary([disabled]='saving', (click)='cancel()') {{ 'Cancel' | translate }}
+    button.btn.btn-primary(
+        [disabled]='saving || !dirty',
+        (click)='save()'
+    )
+        i.fas.fa-spinner.fa-spin.me-2(*ngIf='saving')
+        span(*ngIf='saving') {{ 'Saving...' | translate }}
+        span(*ngIf='!saving') {{ 'Save to server' | translate }}

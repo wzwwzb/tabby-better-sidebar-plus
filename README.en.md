@@ -129,12 +129,13 @@ right-clicking the breadcrumb copies the complete remote path.
   extension), folders-first sorting, hidden files toggle, zebra striping
 - **Multiple selection**, files *and* folders, for bulk delete and move
 - **Chunked loading** of large directory listings
-- **Double-click opens a file in a code editor**, never through the OS file
-  association — so double-clicking an executable edits it instead of running it.
-  Saving sends the file back automatically, checking first that the remote copy
-  has not changed in the meantime, and restoring its permissions afterwards.
-  Symbolic links are resolved, so it is the target that gets edited, not the
-  link
+- **Double-click opens UTF-8 text in Tabby's built-in editor by default**, with
+  no OS editor or download dialog. Saving checks for remote changes and keeps
+  the file's BOM, line endings and permissions. A setting switches to the
+  configured system editor; **Open with…** remains available for one-off use
+  from the context menu. The built-in editor accepts UTF-8 text up to 2 MiB;
+  use a system editor for binary, non-UTF-8 or larger files. Symbolic links are
+  resolved, so it is the target that gets edited, not the link
 - **"Open with…"** stays available, but only from the context menu
 - **Create, rename and delete** entries — `Delete` key included, with an HTML
   confirmation whose default button you choose in the settings
@@ -246,7 +247,8 @@ latency probe, no transfer tracking for a panel nobody is looking at.
 | `sftpAutoRefreshSeconds` | `0` | Re-reads the current folder on a cycle; `0` disables it |
 | `sftpAutoReturnToProfiles` | `true` | Returns to the profile view when no SSH session is open any more |
 | `sftpFollowTerminalDirectory` | `true` | Remembers whether the SFTP view follows the terminal's current directory |
-| `sftpEditorPath` | *(empty)* | Program opened on double-click. Empty, Windows decides |
+| `sftpPreferSystemEditor` | `false` | Use the configured system editor instead of Tabby's built-in text editor; existing users with an editor path keep the previous behavior |
+| `sftpEditorPath` | *(empty)* | Program path used when system-editor mode is enabled |
 | `sftpDeleteDefaultButton` | `cancel` | Which button <kbd>Enter</kbd> activates in the SFTP delete confirmation |
 | `sftpDragOutFolders` | `false` | Allows dragging a *folder* out to the OS, not just a file |
 | `sftpColumns` | `size`, `date`, `mode` | Columns shown in the SFTP listing |
@@ -262,6 +264,8 @@ deletes them.
 </details>
 
 ## ⚠️ Known limitations
+
+- **The built-in text editor handles UTF-8 files up to 2 MiB.** Use system-editor mode or the context-menu "Open with…" action for larger, binary or other-encoding files.
 
 - **Remote editing has no locking.** The plugin checks that the remote file has
   not changed before sending your edit back, and refuses to overwrite if it

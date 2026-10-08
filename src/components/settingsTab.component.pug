@@ -213,6 +213,16 @@
               (ngModelChange)='setHideNativeSftpButton($event)'
             )
 
+        .form-line
+          .header
+            .title {{ lblPreferSystemEditor }} #[i.fas.fa-info-circle.info-hint([title]='lblPreferSystemEditorHint')]
+            .description {{ lblPreferSystemEditorDesc }}
+          .control
+            toggle(
+              [ngModel]='preferSystemEditor',
+              (ngModelChange)='setPreferSystemEditor($event)'
+            )
+
         //- `stacked` : le chemin passe sous son intitulé et prend toute la largeur.
             Sur la même ligne que les deux boutons, il ne restait au champ que
             quelques caractères visibles — un chemin d'exécutable n'y tenait pas.

@@ -83,6 +83,64 @@ export class LocalFileDownload extends FileDownload {
     }
 }
 
+/** 小型内置编辑器用内存接收文本，避免把读取过程显示成一次用户下载。 */
+export class MemoryFileDownload extends FileDownload {
+    private chunks: Buffer[] = []
+    private byteCount = 0
+
+    constructor (
+        private name: string,
+        private size: number,
+        private mode: number,
+        private maxSize: number,
+        private tooLargeMessage: string,
+    ) {
+        super()
+    }
+
+    async openForWriting (): Promise<void> {
+        this.chunks = []
+        this.byteCount = 0
+    }
+
+    getName (): string {
+        return this.name
+    }
+
+    getSize (): number {
+        return this.size
+    }
+
+    getMode (): number {
+        return this.mode
+    }
+
+    async write (chunk: Uint8Array): Promise<void> {
+        if (this.byteCount + chunk.byteLength > this.maxSize) {
+            throw new Error(this.tooLargeMessage)
+        }
+        const copy = Buffer.from(chunk)
+        this.chunks.push(copy)
+        this.byteCount += copy.length
+        this.increaseProgress(copy.length)
+    }
+
+    /** 拿出拼接后的内容；编辑器上限保证这次合并占用内存可控。 */
+    getBuffer (): Buffer {
+        return Buffer.concat(this.chunks, this.byteCount)
+    }
+
+    close (): void {
+        // 内存缓冲区由调用方在模态框关闭后释放。
+    }
+
+    override cancel (): void {
+        super.cancel()
+        this.chunks = []
+        this.byteCount = 0
+    }
+}
+
 /**
  * A zero-byte upload, used to create an empty remote file.
  *

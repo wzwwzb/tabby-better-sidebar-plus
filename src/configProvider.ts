@@ -125,11 +125,10 @@ export class SidebarPlusConfigProvider extends ConfigProvider {
             // the name column is always shown and never listed here. See
             // SidebarPlusSftpBrowserComponent.AVAILABLE_COLUMNS for the ids.
             sftpColumns: ['size', 'date', 'mode'] as string[],
-            // Editor a double-clicked remote file opens in — never the OS
-            // association, which would *run* an executable instead of editing
-            // it. Empty until the first double-click asks for one (or the
-            // settings tab sets it). Prefixed like its SFTP siblings above.
+            // 用户启用系统编辑器模式后使用的程序路径；内置编辑器是默认方式。
             sftpEditorPath: '',
+            // 新安装默认在插件内编辑；旧版已配置系统编辑器路径的用户保留原行为。
+            sftpPreferSystemEditor: undefined as boolean|undefined,
             // Which button of the SFTP delete confirmation holds the focus,
             // i.e. what `Entrée` triggers. Defaults to the non-destructive
             // answer: a confirmation whose default is "yes" deletes on a reflex

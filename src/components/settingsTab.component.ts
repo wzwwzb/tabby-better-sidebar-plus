@@ -46,6 +46,7 @@ export class SidebarPlusSettingsTabComponent {
     section: 'general'|'features'|'snippets' = 'general'
 
     editorPath: string
+    preferSystemEditor: boolean
 
     /** The snippet open in the editor, `null` when the list is showing. A blank `id` means it is new. */
     draft: SidebarSnippet|null = null
@@ -61,6 +62,7 @@ export class SidebarPlusSettingsTabComponent {
     ) {
         this.contentBox = !embedded
         this.editorPath = this.editors.editorPath
+        this.preferSystemEditor = this.editors.preferSystemEditor
         if (SidebarPlusSettingsTabComponent.requestedSection) {
             this.section = SidebarPlusSettingsTabComponent.requestedSection
             SidebarPlusSettingsTabComponent.requestedSection = null
@@ -128,9 +130,12 @@ export class SidebarPlusSettingsTabComponent {
     get lblSystemInformation (): string { return this.i18n.t('System information') }
     get lblSystemInformationHint (): string { return this.i18n.t('Reads Linux performance and filesystem statistics over SSH.') }
     get lblSystemInformationDesc (): string { return this.i18n.t('CPU, memory, processes, network traffic and local filesystems.') }
-    get lblEditor (): string { return this.i18n.t('Remote file editor') }
-    get lblEditorHint (): string { return this.i18n.t('The file is copied, edited, then sent back to the server.') }
-    get lblEditorDesc (): string { return this.i18n.t('Program opened on double-click. Empty, Windows decides.') }
+    get lblEditor (): string { return this.i18n.t('System editor path') }
+    get lblEditorHint (): string { return this.i18n.t('Used only when system-editor mode is enabled.') }
+    get lblEditorDesc (): string { return this.i18n.t('System program used for double-clicks. If empty, choose an app when opening.') }
+    get lblPreferSystemEditor (): string { return this.i18n.t('Prefer the system editor') }
+    get lblPreferSystemEditorHint (): string { return this.i18n.t('Open files in the configured system editor instead of the built-in text editor.') }
+    get lblPreferSystemEditorDesc (): string { return this.i18n.t('Off by default; double-click opens UTF-8 text in Tabby.') }
     get lblEditorPlaceholder (): string { return this.i18n.t('No editor chosen') }
     get lblBrowse (): string { return this.i18n.t('Browse...') }
     get lblClear (): string { return this.i18n.t('Erase') }
@@ -381,6 +386,11 @@ export class SidebarPlusSettingsTabComponent {
 
     async save (): Promise<void> {
         await this.editors.setEditorPath(this.editorPath.trim())
+    }
+
+    async setPreferSystemEditor (value: boolean): Promise<void> {
+        this.preferSystemEditor = value
+        await this.editors.setPreferSystemEditor(value)
     }
 
     /**

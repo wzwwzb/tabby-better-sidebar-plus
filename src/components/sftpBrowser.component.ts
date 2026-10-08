@@ -11,7 +11,7 @@ import { SidebarPlusEditorService } from '../editorLauncher.service'
 import { electronRemote } from '../electronRemote'
 import { EmptyFileUpload } from '../sftpLocalTransfer'
 import { DirectoryWeight, SftpDragOut } from '../sftpDragOut'
-import { OpenMode, SftpRemoteEditor } from '../sftpRemoteEdit'
+import { BuiltinTextEditor, OpenMode, SftpRemoteEditor } from '../sftpRemoteEdit'
 import { SidebarPlusDragOutServer } from '../dragOutServer.service'
 import { freeLocalName } from '../localNames'
 import { SidebarPlusNoticesService } from '../notices.service'
@@ -23,6 +23,7 @@ import { SftpTransfers } from '../transfers'
 import { SidebarPlusTransfersService } from '../transfersRegistry.service'
 import { clampInViewport } from '../viewport'
 import { ConfirmModalComponent } from './confirmModal.component'
+import { SftpTextEditorModalComponent } from './sftpTextEditorModal.component'
 
 /**
  * One rendered row, computed once instead of on every change detection pass.
@@ -259,7 +260,16 @@ export class SidebarPlusSftpBrowserComponent extends SFTPPanelComponent implemen
         const transfers = new SftpTransfers(platform, notices, registry)
         this.fileTransfers = transfers
         this.platformSvc = platform
-        this.editor = new SftpRemoteEditor(notices, editors, transfers, temp, (message, confirmLabel) => this.ask(message, confirmLabel), zone)
+        this.editor = new SftpRemoteEditor(
+            notices,
+            editors,
+            transfers,
+            temp,
+            (message, confirmLabel) => this.ask(message, confirmLabel),
+            zone,
+            (item, text, save) => this.openBuiltinTextEditor(item, text, save),
+            this.i18n,
+        )
         this.dragOut = new SftpDragOut(notices, zone, transfers, temp)
     }
 
@@ -1327,6 +1337,23 @@ export class SidebarPlusSftpBrowserComponent extends SFTPPanelComponent implemen
         modal.componentInstance.confirmLabel = confirmLabel
         modal.componentInstance.defaultButton = 'cancel'
         return await modal.result.catch(() => false)
+    }
+
+    /** 打开插件内置文本框，让远程保存继续走统一的文件冲突检查。 */
+    private async openBuiltinTextEditor (item: SFTPFile, text: string, save: Parameters<BuiltinTextEditor>[2]): Promise<void> {
+        const modal = this.ngbModalService.open(SftpTextEditorModalComponent, {
+            size: 'xl',
+            centered: true,
+            scrollable: true,
+            backdrop: 'static',
+            keyboard: false,
+        })
+        modal.componentInstance.fileName = item.name
+        modal.componentInstance.remotePath = item.fullPath
+        modal.componentInstance.initialText = text
+        modal.componentInstance.text = text
+        modal.componentInstance.saveText = save
+        await modal.result.catch(() => null)
     }
 
     ////// WHERE A DROP LANDS — SHARED BY BOTH KINDS //////

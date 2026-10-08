@@ -4,12 +4,10 @@ import { Inject, Injectable, Optional } from '@angular/core'
 import { ConfigService, FileProvider, NotificationsService } from 'tabby-core'
 import { electronRemote } from './electronRemote'
 
-/**
- * What a downloaded copy is handed to: the configured editor, or the OS's own
- * "open with" dialog when there is none.
- */
+/** 双击远程文件时使用的打开方式。 */
 export type Opener =
-    { kind: 'editor', path: string }
+    { kind: 'builtin' }
+    |{ kind: 'editor', path: string }
     /**
      * `learn` is set only when this dialog stood in for a missing editor, never
      * when the user asked for it explicitly from the context menu: that entry
@@ -17,16 +15,7 @@ export type Opener =
      */
     |{ kind: 'openWith', learn?: boolean }
 
-/**
- * Where a remote file opens once it has been copied locally.
- *
- * The whole point of this service is that a double-click never hands a file to
- * the OS by association: an executable, or a script whose extension is bound to
- * an interpreter, would *run* instead of being edited. Everything that opens a
- * downloaded copy goes through `launchEditor()`, and the only way to reach the
- * OS association at all is the explicit "Ouvrir avec..." entry of the context
- * menu, which is a deliberate escape hatch and never a default.
- */
+/** 管理内置编辑器、配置的系统编辑器和右键菜单中的单次打开方式。 */
 @Injectable({ providedIn: 'root' })
 export class SidebarPlusEditorService {
     constructor (
@@ -44,31 +33,25 @@ export class SidebarPlusEditorService {
         return this.config.store.sidebarPlus?.sftpEditorPath || ''
     }
 
+    get preferSystemEditor (): boolean {
+        return this.config.store.sidebarPlus?.sftpPreferSystemEditor ?? Boolean(this.editorPath)
+    }
+
     async setEditorPath (path: string): Promise<void> {
         this.config.store.sidebarPlus.sftpEditorPath = path
         await this.config.save()
     }
 
-    /**
-     * How a double-clicked file should be opened.
-     *
-     * With an editor configured, that editor — no question asked. Without one,
-     * Windows' own "Ouvrir avec" dialog, which is what the user asked for: it
-     * lists installed applications instead of making them find an .exe in
-     * Program Files.
-     *
-     * That dialog cannot be remembered, and this is not an oversight:
-     * `OpenAs_RunDLL` opens the file with whatever was picked and returns
-     * nothing — no Windows API hands the chosen application back. So it comes
-     * up on every double-click until an editor is set in the settings tab,
-     * which is the one place that can record one.
-     *
-     * Elsewhere (no "Ouvrir avec" outside Windows) the file picker stands in,
-     * and what it returns *is* recorded. Returns null when there is nothing to
-     * open with — callers treat that as "open nothing", never as a licence to
-     * fall back to the OS association.
-     */
+    async setPreferSystemEditor (value: boolean): Promise<void> {
+        this.config.store.sidebarPlus.sftpPreferSystemEditor = value
+        await this.config.save()
+    }
+
+    /** 根据设置返回内置编辑器或系统编辑器；右键“打开方式”由调用方单独处理。 */
     async resolveOpener (): Promise<Opener|null> {
+        if (!this.preferSystemEditor) {
+            return { kind: 'builtin' }
+        }
         const configured = this.editorPath
         if (configured) {
             return { kind: 'editor', path: configured }
