@@ -7,7 +7,7 @@
 SFTP contextuel qui vit *dans* la sidebar plutôt que dans un panneau docké à
 part.
 
-[English](README.md) · **Français** · [简体中文](README.zh-CN.md)
+[English](README.en.md) · **Français** · [简体中文](README.md)
 
 [![License: MIT](https://img.shields.io/github/license/wzwwzb/tabby-better-sidebar-plus?color=0d9488)](LICENSE)
 [![Compatible avec Better Tabby](https://img.shields.io/badge/Better%20Tabby-compatible-0d9488)](#-compatibilite-better-tabby)
