@@ -4,7 +4,12 @@ This fork is published as `tabby-better-sidebar-plus` and starts from upstream
 `tabby-better-sidebar` 1.0.5. The 1.x entries below are inherited upstream
 history; 2.x entries track this fork.
 
-## 2.0.1 — Unreleased
+## 2.0.2 — Unreleased
+
+- **Changed** the npm package description to Chinese while clearly crediting the upstream project.
+- **Improved** npm search metadata with exact package-name and feature keywords.
+
+## 2.0.1 — 2026-10-09
 
 - **Forked** from TooMuhtsh/tabby-better-sidebar; the inherited upstream
   release history follows below.

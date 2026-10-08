@@ -1,7 +1,7 @@
 {
   "name": "tabby-better-sidebar-plus",
-  "version": "2.0.1",
-  "description": "Independent fork of TooMuhtsh/tabby-better-sidebar for Tabby, adding Linux system information, persistent SFTP directory tracking, and SSH toolbar SFTP controls.",
+  "version": "2.0.2",
+  "description": "Tabby 连接侧边栏增强插件（tabby-better-sidebar-plus），基于 TooMuhtsh/tabby-better-sidebar 独立扩展，新增 Linux 系统信息、SFTP 终端目录跟踪与工具栏按钮控制。",
   "keywords": [
     "tabby-plugin",
     "tabby",
@@ -31,7 +31,13 @@
     "notes",
     "transfer-manager",
     "connection-status",
-    "better-tabby"
+    "better-tabby",
+    "tabby-better-sidebar-plus",
+    "better-sidebar-plus",
+    "linux-system-info",
+    "sftp-directory-tracking",
+    "系统信息",
+    "SFTP目录跟踪"
   ],
   "main": "dist/index.js",
   "typings": "dist/src/index.d.ts",
