@@ -1,10 +1,8 @@
 import './sftpBrowser.component.scss'
-import { ComponentPortal } from '@angular/cdk/portal'
-import { Overlay, OverlayRef } from '@angular/cdk/overlay'
 import { posix } from 'path'
 import { filesize } from 'filesize'
-import { firstValueFrom, Subscription, timer } from 'rxjs'
-import { AfterViewChecked, Component, ElementRef, HostListener, Inject, NgZone, OnDestroy, ViewChild, ViewContainerRef } from '@angular/core'
+import { Subscription, timer } from 'rxjs'
+import { AfterViewChecked, ApplicationRef, Component, createComponent, ElementRef, EnvironmentInjector, HostListener, Inject, Injector, NgZone, OnDestroy, ViewChild } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { ConfigService, HTMLFileUpload, LocaleService, NotificationsService, PlatformService, PromptModalComponent } from 'tabby-core'
 import { SFTPContextMenuItemProvider, SFTPFile, SFTPPanelComponent } from 'tabby-ssh'
@@ -231,7 +229,7 @@ export class SidebarPlusSftpBrowserComponent extends SFTPPanelComponent implemen
 
     private editor: SftpRemoteEditor
     private dragOut: SftpDragOut
-    private floatingTextEditors = new Set<OverlayRef>()
+    private floatingTextEditors = new Set<() => void>()
 
     // Declared explicitly rather than relying on Angular inheriting the
     // parent's factory: the parameters are the contract with SSHModule's
@@ -256,8 +254,9 @@ export class SidebarPlusSftpBrowserComponent extends SFTPPanelComponent implemen
         private i18n: SidebarPlusI18nService,
         private dragServer: SidebarPlusDragOutServer,
         private registry: SidebarPlusTransfersService,
-        private overlayService: Overlay,
-        private viewContainerRef: ViewContainerRef,
+        private appRef: ApplicationRef,
+        private environmentInjector: EnvironmentInjector,
+        private injector: Injector,
         @Inject(SFTPContextMenuItemProvider) contextMenuProviders: SFTPContextMenuItemProvider[],
     ) {
         super(ngbModalService, notify, platform, contextMenuProviders)
@@ -345,10 +344,9 @@ export class SidebarPlusSftpBrowserComponent extends SFTPPanelComponent implemen
     ngOnDestroy (): void {
         this.editor.dispose()
         this.dragOut.dispose()
-        for (const overlay of this.floatingTextEditors) {
-            overlay.dispose()
+        for (const close of this.floatingTextEditors) {
+            close()
         }
-        this.floatingTextEditors.clear()
         this.stopAutoRefresh()
         this.stopTerminalDirectoryTracking()
         this.clearDropTarget()
@@ -1350,28 +1348,46 @@ export class SidebarPlusSftpBrowserComponent extends SFTPPanelComponent implemen
 
     /** 打开插件内置文本框，让远程保存继续走统一的文件冲突检查。 */
     private async openBuiltinTextEditor (item: SFTPFile, text: string, save: Parameters<BuiltinTextEditor>[2]): Promise<void> {
-        const overlay = this.overlayService.create({
-            positionStrategy: this.overlayService.position().global().left('6vw').top('4vh'),
-            scrollStrategy: this.overlayService.scrollStrategies.noop(),
-            hasBackdrop: false,
-            panelClass: 'sidebar-plus-text-editor-pane',
-            width: '84vw',
-            height: '90vh',
+        const editor = createComponent(SftpTextEditorModalComponent, {
+            environmentInjector: this.environmentInjector,
+            elementInjector: this.injector,
         })
-        this.floatingTextEditors.add(overlay)
-        const closed = firstValueFrom(overlay.detachments()).then(() => undefined)
+        const host = editor.location.nativeElement as HTMLElement
+        host.classList.add('sidebar-plus-sftp-text-editor-host')
+        let viewAttached = false
+        let closed = false
+        let resolveClosed: () => void
+        const closedPromise = new Promise<void>(resolve => { resolveClosed = resolve })
+        const close = (): void => {
+            if (closed) {
+                return
+            }
+            closed = true
+            this.floatingTextEditors.delete(close)
+            if (viewAttached) {
+                this.appRef.detachView(editor.hostView)
+            }
+            editor.destroy()
+            host.remove()
+            resolveClosed()
+        }
+        this.floatingTextEditors.add(close)
         try {
-            const editor = overlay.attach(new ComponentPortal(SftpTextEditorModalComponent, this.viewContainerRef)).instance
-            editor.fileName = item.name
-            editor.remotePath = item.fullPath
-            editor.initialText = text
-            editor.text = text
-            editor.saveText = save
-            editor.closeWindow = () => overlay.dispose()
-            await closed
+            Object.assign(editor.instance, {
+                fileName: item.name,
+                remotePath: item.fullPath,
+                initialText: text,
+                text,
+                saveText: save,
+                closeWindow: close,
+            })
+            this.appRef.attachView(editor.hostView)
+            viewAttached = true
+            this.elementRef.nativeElement.ownerDocument.body.appendChild(host)
+            editor.changeDetectorRef.detectChanges()
+            await closedPromise
         } finally {
-            this.floatingTextEditors.delete(overlay)
-            overlay.dispose()
+            close()
         }
     }
 

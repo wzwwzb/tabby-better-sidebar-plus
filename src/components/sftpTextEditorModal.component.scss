@@ -1,21 +1,6 @@
-.cdk-overlay-container {
+.sidebar-plus-sftp-text-editor-host {
     position: fixed;
-    z-index: 1000;
     inset: 0;
-    pointer-events: none;
-}
-
-.cdk-overlay-pane {
-    position: absolute;
-    z-index: 1000;
-    display: flex;
-    max-width: 100%;
-    max-height: 100%;
-    box-sizing: border-box;
-    pointer-events: auto;
-}
-
-.sidebar-plus-text-editor-pane {
     z-index: 1200;
     pointer-events: none;
 }
@@ -28,10 +13,13 @@ sidebar-plus-sftp-text-editor-modal {
 }
 
 .sidebar-plus-text-editor-window {
+    position: fixed;
+    top: 4vh;
+    left: 6vw;
     display: flex;
     flex-direction: column;
-    width: 100%;
-    height: 100%;
+    width: 84vw;
+    height: 90vh;
     min-height: 0;
     overflow: hidden;
     pointer-events: auto;
