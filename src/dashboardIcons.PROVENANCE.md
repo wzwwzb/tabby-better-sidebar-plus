@@ -6,7 +6,7 @@ JSON is a static, offline asset checked into the repository — no network
 access happens at runtime, only at generation time by this script.
 
 - **Upstream commit**: `d64ee64282b076fa15e150b32c6880172880dd00`
-- **Generated**: 2026-08-09
+- **Generated**: 2026-10-09
 - **Cap applied**: 50 KB per individual SVG file (before any
   grouping into variants) — files over the cap are dropped entirely, not
   truncated. They remain reachable through the plugin's own "Import from an
@@ -17,6 +17,8 @@ access happens at runtime, only at generation time by this script.
   the icons that actually have light/dark files on disk. `metadata.json` is
   only used for its per-icon `aliases` (search synonyms).
 
+- **SVG size optimization**: 3205 variants were normalized by shortening path commands and rounding drawing values to three decimal places (transforms to five). IDs, CSS, colors, aliases and variants are preserved; one unparsable source file remains unchanged (`kimi-ai:default`).
+
 ## Counts (this generation)
 
 | | |
@@ -25,9 +27,11 @@ access happens at runtime, only at generation time by this script.
 | Excluded — over the 50 KB cap | 80 (29.3 MB) |
 | Excluded — non-standard SVG root after cleanup | 8 |
 | Kept individual SVG files | 3206 |
+| Optimized SVG variants | 3205 |
+| Original SVG variants retained after parse error | 1 |
 | Logical icons in `dashboardIcons.json` | 2468 |
 | — of which with more than one variant | 665 |
-| `dashboardIcons.json` size | 11.97 MB (12552670 bytes) |
+| `dashboardIcons.json` size | 10.49 MB (10997105 bytes) |
 
 ## Regenerating
 

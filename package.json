@@ -54,6 +54,7 @@
     "build:prod": "webpack --progress --color --mode production && node scripts/strip-source-maps.js",
     "watch": "webpack --progress --color --watch",
     "test:text-document": "node scripts/test-text-document-tools.js",
+    "test:dashboard-icons": "node scripts/test-dashboard-icon-optimizer.js",
     "lint:airules": "html-validate \".AIRules/**/*.html\"",
     "lint:i18n": "node scripts/lint-i18n.js",
     "prepublishOnly": "npm run build:prod"
@@ -93,6 +94,7 @@
     "sass": "^1.60.0",
     "sass-loader": "^13.2.0",
     "style-loader": "^3.3.0",
+    "svgo": "^4.1.0",
     "tabby-core": "^1.0.231-nightly.0",
     "tabby-settings": "^1.0.231-nightly.0",
     "tabby-terminal": "^1.0.231-nightly.0",

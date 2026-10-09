@@ -39,6 +39,7 @@ const fs = require('fs')
 const os = require('os')
 const path = require('path')
 const { execFileSync } = require('child_process')
+const { optimizeDashboardSvg } = require('./dashboardIconsOptimizer')
 
 const REPO_URL = 'https://github.com/homarr-labs/dashboard-icons.git'
 const CAP_BYTES = 50 * 1024
@@ -299,6 +300,7 @@ function main () {
         let excludedByCap = 0
         let excludedByCapBytes = 0
         let excludedMalformed = 0
+        let svgOptimizationSkipped = 0
         let totalRawBytes = 0
 
         for (const file of allFiles) {
@@ -320,7 +322,14 @@ function main () {
                 excludedMalformed++
                 continue
             }
-            kept.set(file, isolateSvg(cleaned, file.replace(/\.svg$/i, '')))
+            const isolated = isolateSvg(cleaned, file.replace(/\.svg$/i, ''))
+            try {
+                kept.set(file, optimizeDashboardSvg(isolated))
+            } catch {
+                // 保留异常 SVG 原图，不能让单个文件中断整套图库生成。
+                kept.set(file, isolated)
+                svgOptimizationSkipped++
+            }
         }
 
         // Pass 2: group kept files into logical icons by filename convention.
@@ -376,6 +385,7 @@ function main () {
             excludedByCapMB: (excludedByCapBytes / 1024 / 1024).toFixed(1),
             excludedMalformed,
             keptFiles: kept.size,
+            svgOptimizationSkipped,
             logicalIcons: Object.keys(data).length,
             multiVariantIcons: multiVariantCount,
             jsonBytes: json.length,
@@ -385,6 +395,7 @@ function main () {
         writeProvenance(commit, stats)
 
         log(`wrote ${OUT_JSON} (${stats.jsonMB} MB, ${stats.logicalIcons} icons, ${stats.multiVariantIcons} with more than one variant)`)
+        log(`SVGO normalized ${stats.keptFiles - stats.svgOptimizationSkipped} SVG variants; kept ${stats.svgOptimizationSkipped} original file(s) that could not be parsed`)
         log(`excluded: ${stats.excludedByCap} over ${CAP_BYTES / 1024} KB (${stats.excludedByCapMB} MB), ${stats.excludedMalformed} with a non-standard SVG root after cleanup`)
     } finally {
         fs.rmSync(tmpDir, { recursive: true, force: true })
@@ -413,6 +424,8 @@ access happens at runtime, only at generation time by this script.
   the icons that actually have light/dark files on disk. \`metadata.json\` is
   only used for its per-icon \`aliases\` (search synonyms).
 
+- **SVG size optimization**: ${stats.keptFiles - stats.svgOptimizationSkipped} variants are normalized by shortening path commands and rounding drawing values to three decimal places. IDs, CSS, colors, aliases and variants are preserved; ${stats.svgOptimizationSkipped} unparsable source file(s) are kept unchanged.
+
 ## Counts (this generation)
 
 | | |
@@ -421,6 +434,8 @@ access happens at runtime, only at generation time by this script.
 | Excluded — over the ${CAP_BYTES / 1024} KB cap | ${stats.excludedByCap} (${stats.excludedByCapMB} MB) |
 | Excluded — non-standard SVG root after cleanup | ${stats.excludedMalformed} |
 | Kept individual SVG files | ${stats.keptFiles} |
+| Optimized SVG variants | ${stats.keptFiles - stats.svgOptimizationSkipped} |
+| Kept unchanged after SVG parser error | ${stats.svgOptimizationSkipped} |
 | Logical icons in \`dashboardIcons.json\` | ${stats.logicalIcons} |
 | — of which with more than one variant | ${stats.multiVariantIcons} |
 | \`dashboardIcons.json\` size | ${stats.jsonMB} MB (${stats.jsonBytes} bytes) |

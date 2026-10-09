@@ -144,7 +144,10 @@ cannot repaint the artwork, internal `id` attributes and the references to them
 are prefixed per icon so gradients and clip paths cannot collide between two
 icons shown side by side, and any embedded `<style>` block is scoped to its own
 icon, with `@font-face` rules dropped. XML prologs, comments and `<script>`
-elements are stripped. No artwork is otherwise altered.
+elements are stripped. A build-time SVGO pass then shortens SVG path commands,
+normalizes drawing values to three decimal places and transforms to five; it
+leaves IDs, embedded CSS, colors, aliases and variants intact. SVGO itself is a
+development tool and is not bundled into the plugin.
 
 The logos and marks depicted by these icons remain the property of their
 respective owners; their inclusion here is solely to let a user identify a
