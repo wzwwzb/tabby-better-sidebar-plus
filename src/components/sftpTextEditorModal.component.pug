@@ -1,12 +1,13 @@
 .modal-content.sidebar-plus-text-editor-window(
+    #window,
     cdkDrag,
     cdkDragBoundary='body',
     role='dialog',
     aria-modal='false',
     [attr.aria-label]="'Edit remote text file' | translate"
 )
-    .modal-header
-        h5.modal-title.no-wrap.editor-drag-handle(cdkDragHandle)
+    .modal-header.editor-drag-handle(cdkDragHandle)
+        h5.modal-title.no-wrap
             i.fas.fa-grip-vertical.me-2
             | {{ 'Edit remote text file' | translate }}: {{ fileName }}
         button.btn-close([disabled]='saving', (click)='cancel()')
@@ -15,9 +16,28 @@
         .remote-text-editor-path.text-muted.small.mb-2([title]='remotePath') {{ remotePath }}
         .remote-text-editor-hint.text-muted.small.mb-2 {{ 'UTF-8 text only; files larger than {size} are not supported.' | translate:{ size: '2 MiB' } }}
         .remote-text-editor-hint.text-muted.small.mb-2 {{ 'Drag the title bar to move; drag the lower-right corner to resize.' | translate }}
+        .remote-text-editor-toolbar.d-flex.align-items-center.justify-content-between.gap-2.mb-2
+            span.badge.text-bg-secondary(*ngIf='syntaxFormat') {{ syntaxFormat.toUpperCase() }}
+            span.text-muted.small(*ngIf='!syntaxFormat') {{ 'Plain text' | translate }}
+            .d-flex.gap-2
+                button.btn.btn-sm.btn-outline-secondary(
+                    type='button',
+                    [disabled]='saving || !syntaxFormat',
+                    (click)='checkSyntax()'
+                )
+                    i.fas.fa-check-circle.me-1
+                    | {{ 'Check syntax' | translate }}
+                button.btn.btn-sm.btn-outline-secondary(
+                    type='button',
+                    [disabled]='saving || !syntaxFormat || syntaxPending || !syntaxChecked || syntaxIssues.length > 0',
+                    (click)='formatText()'
+                )
+                    i.fas.fa-align-left.me-1
+                    | {{ 'Format' | translate }}
         textarea.form-control.remote-text-editor-field(
             #field,
             [(ngModel)]='text',
+            (ngModelChange)='onTextChanged()',
             [readonly]='saving',
             spellcheck='false',
             autocomplete='off',
@@ -25,6 +45,20 @@
             wrap='off',
             (keydown)='onKeydown($event)'
         )
+        .editor-syntax-status.small.mt-2(aria-live='polite', role='status')
+            span.text-muted(*ngIf='!syntaxFormat') {{ 'No syntax check for this file type.' | translate }}
+            span.text-muted(*ngIf='syntaxFormat && syntaxPending') {{ 'Checking syntax...' | translate }}
+            span.text-success(*ngIf='syntaxFormat && syntaxChecked && !syntaxIssues.length') {{ 'Syntax is valid.' | translate }}
+            .text-danger(*ngIf='syntaxFormat && syntaxChecked && syntaxIssues.length')
+                div {{ 'Syntax errors found: {count}' | translate:{ count: syntaxIssues.length } }}
+                .editor-syntax-issue-list
+                    button.editor-syntax-issue(
+                        type='button',
+                        *ngFor='let issue of syntaxIssues.slice(0, 5)',
+                        (click)='jumpToSyntaxIssue(issue)'
+                    ) {{ 'Line {line}, column {column}: {message}' | translate:{ line: issue.line, column: issue.column, message: issue.message } }}
+                div.text-muted(*ngIf='syntaxIssues.length > 5') {{ 'More syntax errors: {count}' | translate:{ count: syntaxIssues.length - 5 } }}
+            div.text-warning(*ngIf='formatFailure') {{ 'Could not format this document: {message}' | translate:{ message: formatFailure } }}
         .text-warning.small.mt-2(*ngIf='dirty') {{ 'Unsaved changes' | translate }}
         .text-danger.small.mt-2(*ngIf='saveFailed') {{ 'Could not save to the server. Check the notification and try again.' | translate }}
 
@@ -33,7 +67,11 @@
             span.me-auto {{ 'Discard unsaved changes to {name}?' | translate:{ name: fileName } }}
             button.btn.btn-secondary((click)='keepEditing()') {{ 'Keep editing' | translate }}
             button.btn.btn-danger((click)='discardChanges()') {{ 'Discard changes' | translate }}
-        ng-container(*ngIf='!confirmingDiscard')
+        .discard-confirmation.w-100.d-flex.align-items-center.gap-2(*ngIf='!confirmingDiscard && confirmingSyntaxSave')
+            span.me-auto.text-warning {{ 'Syntax errors found. Save anyway?' | translate }}
+            button.btn.btn-secondary((click)='continueEditing()') {{ 'Keep editing' | translate }}
+            button.btn.btn-warning([disabled]='saving', (click)='saveWithSyntaxErrors()') {{ 'Save anyway' | translate }}
+        ng-container(*ngIf='!confirmingDiscard && !confirmingSyntaxSave')
             button.btn.btn-secondary([disabled]='saving', (click)='cancel()') {{ 'Cancel' | translate }}
             button.btn.btn-primary(
                 [disabled]='saving || !dirty',
@@ -42,3 +80,11 @@
                 i.fas.fa-spinner.fa-spin.me-2(*ngIf='saving')
                 span(*ngIf='saving') {{ 'Saving...' | translate }}
                 span(*ngIf='!saving') {{ 'Save to server' | translate }}
+
+    button.editor-resize-handle(
+        type='button',
+        [attr.aria-label]="'Resize editor window' | translate",
+        [title]="'Resize editor window' | translate",
+        (pointerdown)='startResize($event)',
+        (keydown)='resizeWithKeyboard($event)'
+    )

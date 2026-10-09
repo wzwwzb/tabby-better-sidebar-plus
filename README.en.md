@@ -129,7 +129,7 @@ right-clicking the breadcrumb copies the complete remote path.
   extension), folders-first sorting, hidden files toggle, zebra striping
 - **Multiple selection**, files *and* folders, for bulk delete and move
 - **Chunked loading** of large directory listings
-- **Double-click opens UTF-8 text in Tabby's built-in editor by default**, with
+- **Double-click opens UTF-8 text in the plugin's built-in editor by default**, with
   no OS editor or download dialog. Saving checks for remote changes and keeps
   the file's BOM, line endings and permissions. A setting switches to the
   configured system editor; **Open with…** remains available for one-off use
@@ -138,6 +138,9 @@ right-clicking the breadcrumb copies the complete remote path.
   resolved, so it is the target that gets edited, not the link
 - The editor is a draggable, resizable, non-modal window, so the terminal
   remains usable for copying command output while you edit
+- The built-in editor checks and formats JSON, YAML, INI, XML and HTML. It shows
+  syntax issues with line and column numbers; click an issue to jump to it.
+  Saving while errors remain asks for confirmation
 - **"Open with…"** stays available, but only from the context menu
 - **Create, rename and delete** entries — `Delete` key included, with an HTML
   confirmation whose default button you choose in the settings

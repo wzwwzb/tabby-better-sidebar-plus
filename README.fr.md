@@ -138,7 +138,7 @@ du terminal. Le bouton de ciblage à côté d'Actualiser active ou désactive ce
 - **Sélection multiple**, fichiers *et* dossiers, pour supprimer ou déplacer par
   lot
 - **Chargement par blocs** des listings volumineux
-- **Le double-clic ouvre le texte UTF-8 dans l'éditeur intégré à Tabby par
+- **Le double-clic ouvre le texte UTF-8 dans l'éditeur intégré au plugin par
   défaut**, sans lancer un éditeur externe ni afficher de dialogue de
   téléchargement. L'enregistrement vérifie les changements distants et
   conserve le BOM, les fins de ligne et les permissions. Un réglage permet de
@@ -149,6 +149,9 @@ du terminal. Le bouton de ciblage à côté d'Actualiser active ou désactive ce
   c'est la cible qui est éditée, pas le lien
 - La fenêtre d'édition est déplaçable, redimensionnable et non modale : le
   terminal reste utilisable pour copier des commandes pendant la modification
+- L'éditeur vérifie et formate JSON, YAML, INI, XML et HTML. Les erreurs de
+  syntaxe affichent la ligne et la colonne ; cliquez sur une erreur pour y aller.
+  Enregistrer avec des erreurs demande une confirmation
 - **« Ouvrir avec… »** reste disponible, mais seulement depuis le menu contextuel
 - **Créer, renommer et supprimer** des entrées — touche `Suppr` comprise, avec
   une confirmation HTML dont vous choisissez le bouton par défaut dans les

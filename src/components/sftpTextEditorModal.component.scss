@@ -12,35 +12,68 @@ sidebar-plus-sftp-text-editor-modal {
     pointer-events: none;
 }
 
-.sidebar-plus-text-editor-window {
+.modal-content.sidebar-plus-text-editor-window {
     position: fixed;
-    top: 8vh;
-    left: 10vw;
+    top: 6vh;
+    left: 5vw;
     display: flex;
     flex-direction: column;
-    width: 72vw;
+    width: min(72vw, 1100px);
     height: 72vh;
-    min-width: min(600px, 88vw);
-    min-height: min(380px, 80vh);
-    max-width: 94vw;
+    min-width: min(620px, 90vw);
+    min-height: min(380px, 84vh);
+    max-width: 90vw;
     max-height: 88vh;
-    resize: both;
-    overflow: auto;
+    box-sizing: border-box;
+    overflow: hidden;
     pointer-events: auto;
-    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.45);
+    background-color: var(--theme-bg);
+    color: var(--theme-fg);
+    border: 1px solid var(--theme-secondary);
+    border-radius: 0.45rem;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
 }
 
-.sidebar-plus-text-editor-window .modal-body {
+.modal-content.sidebar-plus-text-editor-window > .modal-header,
+.modal-content.sidebar-plus-text-editor-window > .modal-footer {
+    flex: 0 0 auto;
+    background-color: var(--theme-bg);
+    color: var(--theme-fg);
+    opacity: 1;
+}
+
+.modal-content.sidebar-plus-text-editor-window > .modal-header {
+    gap: 0.75rem;
+    border-bottom: 1px solid var(--theme-secondary);
+}
+
+.modal-content.sidebar-plus-text-editor-window > .modal-footer {
+    padding-right: 2rem;
+    border-top: 1px solid var(--theme-secondary);
+}
+
+.modal-content.sidebar-plus-text-editor-window > .modal-body {
     display: flex;
     flex: 1 1 auto;
     flex-direction: column;
     min-height: 0;
     overflow: hidden;
+    background-color: var(--theme-bg);
+    color: var(--theme-fg);
 }
 
 .editor-drag-handle {
     cursor: move;
     user-select: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.modal-content.sidebar-plus-text-editor-window .modal-title {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .remote-text-editor-path {
@@ -51,6 +84,10 @@ sidebar-plus-sftp-text-editor-modal {
     white-space: normal;
 }
 
+.remote-text-editor-toolbar {
+    flex: 0 0 auto;
+}
+
 .remote-text-editor-field {
     flex: 1 1 auto;
     width: 100%;
@@ -59,4 +96,70 @@ sidebar-plus-sftp-text-editor-modal {
     resize: vertical;
     font-family: var(--font-family-monospace, monospace);
     tab-size: 4;
+}
+
+.editor-syntax-status {
+    flex: 0 0 auto;
+    max-height: 7rem;
+    overflow: auto;
+}
+
+.editor-syntax-issue-list {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    max-height: 4.5rem;
+    overflow: auto;
+}
+
+.editor-syntax-issue {
+    max-width: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    text-decoration: underline dotted;
+    overflow-wrap: anywhere;
+
+    &:hover,
+    &:focus-visible {
+        color: var(--theme-primary);
+    }
+}
+
+// 用清晰的斜纹角柄提供稳定的鼠标与键盘缩放入口。
+.editor-resize-handle {
+    position: absolute;
+    right: 2px;
+    bottom: 2px;
+    z-index: 2;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: 0;
+    border-radius: 0.2rem;
+    background: transparent;
+    color: var(--theme-secondary-fg);
+    cursor: nwse-resize;
+    touch-action: none;
+
+    &::before {
+        position: absolute;
+        inset: 5px;
+        background: repeating-linear-gradient(135deg, transparent 0 3px, currentColor 3px 4px);
+        content: '';
+        opacity: 0.75;
+    }
+
+    &:hover,
+    &:focus-visible {
+        background-color: var(--theme-secondary);
+        color: var(--theme-primary);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--theme-primary);
+        outline-offset: -2px;
+    }
 }
