@@ -136,8 +136,8 @@ right-clicking the breadcrumb copies the complete remote path.
   from the context menu. The built-in editor accepts UTF-8 text up to 2 MiB;
   use a system editor for binary, non-UTF-8 or larger files. Symbolic links are
   resolved, so it is the target that gets edited, not the link
-- The editor is a draggable, non-modal window, so the terminal remains usable
-  for copying command output while you edit
+- The editor is a draggable, resizable, non-modal window, so the terminal
+  remains usable for copying command output while you edit
 - **"Open with…"** stays available, but only from the context menu
 - **Create, rename and delete** entries — `Delete` key included, with an HTML
   confirmation whose default button you choose in the settings

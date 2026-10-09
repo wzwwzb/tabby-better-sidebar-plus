@@ -14,6 +14,7 @@
     .modal-body.remote-text-editor-body
         .remote-text-editor-path.text-muted.small.mb-2([title]='remotePath') {{ remotePath }}
         .remote-text-editor-hint.text-muted.small.mb-2 {{ 'UTF-8 text only; files larger than {size} are not supported.' | translate:{ size: '2 MiB' } }}
+        .remote-text-editor-hint.text-muted.small.mb-2 {{ 'Drag the title bar to move; drag the lower-right corner to resize.' | translate }}
         textarea.form-control.remote-text-editor-field(
             #field,
             [(ngModel)]='text',

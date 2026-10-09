@@ -14,14 +14,18 @@ sidebar-plus-sftp-text-editor-modal {
 
 .sidebar-plus-text-editor-window {
     position: fixed;
-    top: 4vh;
-    left: 6vw;
+    top: 8vh;
+    left: 10vw;
     display: flex;
     flex-direction: column;
-    width: 84vw;
-    height: 90vh;
-    min-height: 0;
-    overflow: hidden;
+    width: 72vw;
+    height: 72vh;
+    min-width: min(600px, 88vw);
+    min-height: min(380px, 80vh);
+    max-width: 94vw;
+    max-height: 88vh;
+    resize: both;
+    overflow: auto;
     pointer-events: auto;
     box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.45);
 }

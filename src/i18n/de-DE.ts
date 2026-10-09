@@ -510,6 +510,7 @@ const de_DE: Record<string, string> = {
     'Off by default; double-click opens UTF-8 text in Tabby.': 'Standardmäßig aus; Doppelklick öffnet UTF-8-Text in Tabby.',
     'Edit remote text file': 'Entfernte Textdatei bearbeiten',
     'UTF-8 text only; files larger than {size} are not supported.': 'Nur UTF-8-Text; Dateien über {size} werden nicht unterstützt.',
+    'Drag the title bar to move; drag the lower-right corner to resize.': 'Zum Verschieben die Titelleiste, zum Ändern der Größe die rechte untere Ecke ziehen.',
     'Save to server': 'Auf dem Server speichern',
     'Saving...': 'Wird gespeichert…',
     'Unsaved changes': 'Ungespeicherte Änderungen',

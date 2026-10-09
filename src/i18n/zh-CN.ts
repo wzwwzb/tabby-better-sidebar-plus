@@ -507,6 +507,7 @@ const zh_CN: Record<string, string> = {
     'Off by default; double-click opens UTF-8 text in Tabby.': '默认关闭；双击时在 Tabby 内编辑 UTF-8 文本。',
     'Edit remote text file': '编辑远程文本文件',
     'UTF-8 text only; files larger than {size} are not supported.': '仅支持 UTF-8 文本，且文件不能超过 {size}。',
+    'Drag the title bar to move; drag the lower-right corner to resize.': '拖动标题栏移动窗口；拖动右下角调整大小。',
     'Save to server': '保存到服务器',
     'Saving...': '正在保存…',
     'Unsaved changes': '有未保存的更改',
