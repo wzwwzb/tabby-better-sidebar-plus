@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { FormsModule } from '@angular/forms'
 import { DragDropModule } from '@angular/cdk/drag-drop'
+import { OverlayModule } from '@angular/cdk/overlay'
 import TabbyCoreModule, { ConfigProvider, HotkeyProvider } from 'tabby-core'
 import { SettingsTabProvider } from 'tabby-settings'
 
@@ -44,6 +45,7 @@ const SIDEBAR_PANEL_CONTRIBUTION: BetterPanelContribution = {
         CommonModule,
         FormsModule,
         DragDropModule,
+        OverlayModule,
         TabbyCoreModule,
     ],
     providers: [

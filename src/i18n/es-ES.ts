@@ -515,6 +515,7 @@ const es_ES: Record<string, string> = {
     'Saving...': 'Guardando…',
     'Unsaved changes': 'Cambios sin guardar',
     'Discard unsaved changes to {name}?': '¿Descartar los cambios sin guardar de {name}?',
+    'Keep editing': 'Seguir editando',
     'Discard changes': 'Descartar cambios',
     'Could not save to the server. Check the notification and try again.': 'No se pudo guardar en el servidor. Revisa la notificación e inténtalo de nuevo.',
     'Cannot open this file in the built-in editor. It must be UTF-8 text no larger than {size}.': 'No se puede abrir este archivo en el editor integrado. Debe ser texto UTF-8 y no superar {size}.',

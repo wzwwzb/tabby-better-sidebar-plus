@@ -511,6 +511,7 @@ const zh_CN: Record<string, string> = {
     'Saving...': '正在保存…',
     'Unsaved changes': '有未保存的更改',
     'Discard unsaved changes to {name}?': '要放弃对 {name} 的未保存更改吗？',
+    'Keep editing': '继续编辑',
     'Discard changes': '放弃更改',
     'Could not save to the server. Check the notification and try again.': '无法保存到服务器。请查看通知后重试。',
     'Cannot open this file in the built-in editor. It must be UTF-8 text no larger than {size}.': '无法使用内置编辑器打开此文件。文件必须是 UTF-8 文本且不超过 {size}。',

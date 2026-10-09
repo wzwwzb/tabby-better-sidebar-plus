@@ -1,8 +1,10 @@
 import './sftpBrowser.component.scss'
+import { ComponentPortal } from '@angular/cdk/portal'
+import { Overlay, OverlayRef } from '@angular/cdk/overlay'
 import { posix } from 'path'
 import { filesize } from 'filesize'
-import { Subscription, timer } from 'rxjs'
-import { AfterViewChecked, Component, ElementRef, HostListener, Inject, NgZone, OnDestroy, ViewChild } from '@angular/core'
+import { firstValueFrom, Subscription, timer } from 'rxjs'
+import { AfterViewChecked, Component, ElementRef, HostListener, Inject, NgZone, OnDestroy, ViewChild, ViewContainerRef } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { ConfigService, HTMLFileUpload, LocaleService, NotificationsService, PlatformService, PromptModalComponent } from 'tabby-core'
 import { SFTPContextMenuItemProvider, SFTPFile, SFTPPanelComponent } from 'tabby-ssh'
@@ -229,6 +231,7 @@ export class SidebarPlusSftpBrowserComponent extends SFTPPanelComponent implemen
 
     private editor: SftpRemoteEditor
     private dragOut: SftpDragOut
+    private floatingTextEditors = new Set<OverlayRef>()
 
     // Declared explicitly rather than relying on Angular inheriting the
     // parent's factory: the parameters are the contract with SSHModule's
@@ -253,6 +256,8 @@ export class SidebarPlusSftpBrowserComponent extends SFTPPanelComponent implemen
         private i18n: SidebarPlusI18nService,
         private dragServer: SidebarPlusDragOutServer,
         private registry: SidebarPlusTransfersService,
+        private overlayService: Overlay,
+        private viewContainerRef: ViewContainerRef,
         @Inject(SFTPContextMenuItemProvider) contextMenuProviders: SFTPContextMenuItemProvider[],
     ) {
         super(ngbModalService, notify, platform, contextMenuProviders)
@@ -340,6 +345,10 @@ export class SidebarPlusSftpBrowserComponent extends SFTPPanelComponent implemen
     ngOnDestroy (): void {
         this.editor.dispose()
         this.dragOut.dispose()
+        for (const overlay of this.floatingTextEditors) {
+            overlay.dispose()
+        }
+        this.floatingTextEditors.clear()
         this.stopAutoRefresh()
         this.stopTerminalDirectoryTracking()
         this.clearDropTarget()
@@ -1341,19 +1350,29 @@ export class SidebarPlusSftpBrowserComponent extends SFTPPanelComponent implemen
 
     /** 打开插件内置文本框，让远程保存继续走统一的文件冲突检查。 */
     private async openBuiltinTextEditor (item: SFTPFile, text: string, save: Parameters<BuiltinTextEditor>[2]): Promise<void> {
-        const modal = this.ngbModalService.open(SftpTextEditorModalComponent, {
-            size: 'xl',
-            centered: true,
-            scrollable: true,
-            backdrop: 'static',
-            keyboard: false,
+        const overlay = this.overlayService.create({
+            positionStrategy: this.overlayService.position().global().left('6vw').top('4vh'),
+            scrollStrategy: this.overlayService.scrollStrategies.noop(),
+            hasBackdrop: false,
+            panelClass: 'sidebar-plus-text-editor-pane',
+            width: '84vw',
+            height: '90vh',
         })
-        modal.componentInstance.fileName = item.name
-        modal.componentInstance.remotePath = item.fullPath
-        modal.componentInstance.initialText = text
-        modal.componentInstance.text = text
-        modal.componentInstance.saveText = save
-        await modal.result.catch(() => null)
+        this.floatingTextEditors.add(overlay)
+        const closed = firstValueFrom(overlay.detachments()).then(() => undefined)
+        try {
+            const editor = overlay.attach(new ComponentPortal(SftpTextEditorModalComponent, this.viewContainerRef)).instance
+            editor.fileName = item.name
+            editor.remotePath = item.fullPath
+            editor.initialText = text
+            editor.text = text
+            editor.saveText = save
+            editor.closeWindow = () => overlay.dispose()
+            await closed
+        } finally {
+            this.floatingTextEditors.delete(overlay)
+            overlay.dispose()
+        }
     }
 
     ////// WHERE A DROP LANDS — SHARED BY BOTH KINDS //////

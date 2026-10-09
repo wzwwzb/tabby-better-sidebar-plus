@@ -514,6 +514,7 @@ const de_DE: Record<string, string> = {
     'Saving...': 'Wird gespeichert…',
     'Unsaved changes': 'Ungespeicherte Änderungen',
     'Discard unsaved changes to {name}?': 'Ungespeicherte Änderungen an {name} verwerfen?',
+    'Keep editing': 'Weiter bearbeiten',
     'Discard changes': 'Änderungen verwerfen',
     'Could not save to the server. Check the notification and try again.': 'Speichern auf dem Server nicht möglich. Benachrichtigung prüfen und erneut versuchen.',
     'Cannot open this file in the built-in editor. It must be UTF-8 text no larger than {size}.': 'Datei kann im integrierten Editor nicht geöffnet werden. Erforderlich sind UTF-8-Text und höchstens {size}.',

@@ -147,6 +147,8 @@ du terminal. Le bouton de ciblage à côté d'Actualiser active ou désactive ce
   UTF-8 jusqu'à 2 Mio ; utilisez l'éditeur système pour les fichiers binaires,
   d'un autre encodage ou plus volumineux. Les liens symboliques sont résolus :
   c'est la cible qui est éditée, pas le lien
+- La fenêtre d'édition est déplaçable et non modale : le terminal reste
+  utilisable pour copier des commandes pendant la modification
 - **« Ouvrir avec… »** reste disponible, mais seulement depuis le menu contextuel
 - **Créer, renommer et supprimer** des entrées — touche `Suppr` comprise, avec
   une confirmation HTML dont vous choisissez le bouton par défaut dans les

@@ -1,8 +1,5 @@
 import './sftpTextEditorModal.component.scss'
 import { AfterViewInit, Component, ElementRef, Input, ViewChild } from '@angular/core'
-import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { SidebarPlusI18nService } from '../i18n'
-import { ConfirmModalComponent } from './confirmModal.component'
 
 /** 在 Tabby 内编辑一个远程 UTF-8 文本文件。 */
 @Component({
@@ -15,17 +12,13 @@ export class SftpTextEditorModalComponent implements AfterViewInit {
     @Input() initialText = ''
     @Input() text = ''
     @Input() saveText: ((text: string) => Promise<boolean>)|null = null
+    @Input() closeWindow: (() => void)|null = null
 
     @ViewChild('field') field: ElementRef<HTMLTextAreaElement>
 
     saving = false
     saveFailed = false
-
-    constructor (
-        private activeModal: NgbActiveModal,
-        private ngbModal: NgbModal,
-        private i18n: SidebarPlusI18nService,
-    ) { }
+    confirmingDiscard = false
 
     /** 动画完成后聚焦文本区，便于立即编辑。 */
     ngAfterViewInit (): void {
@@ -53,7 +46,7 @@ export class SftpTextEditorModalComponent implements AfterViewInit {
         this.saveFailed = false
         try {
             if (await this.saveText(this.text)) {
-                this.activeModal.close(this.text)
+                this.closeWindow?.()
             } else {
                 this.saveFailed = true
             }
@@ -64,21 +57,24 @@ export class SftpTextEditorModalComponent implements AfterViewInit {
         }
     }
 
-    async cancel (): Promise<void> {
+    cancel (): void {
         if (this.saving) {
             return
         }
-        if (this.dirty && !await this.confirmDiscard()) {
+        if (this.dirty) {
+            this.confirmingDiscard = true
             return
         }
-        this.activeModal.dismiss()
+        this.closeWindow?.()
     }
 
-    private async confirmDiscard (): Promise<boolean> {
-        const modal = this.ngbModal.open(ConfirmModalComponent)
-        modal.componentInstance.message = this.i18n.t('Discard unsaved changes to {name}?', { name: this.fileName })
-        modal.componentInstance.confirmLabel = this.i18n.t('Discard changes')
-        modal.componentInstance.danger = false
-        return await modal.result.catch(() => false)
+    keepEditing (): void {
+        this.confirmingDiscard = false
+    }
+
+    discardChanges (): void {
+        if (!this.saving) {
+            this.closeWindow?.()
+        }
     }
 }

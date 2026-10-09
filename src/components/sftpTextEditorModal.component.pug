@@ -1,29 +1,43 @@
-.modal-header
-    h5.modal-title.no-wrap {{ 'Edit remote text file' | translate }}: {{ fileName }}
-    button.btn-close([disabled]='saving', (click)='cancel()')
+.modal-content.sidebar-plus-text-editor-window(
+    cdkDrag,
+    cdkDragBoundary='body',
+    role='dialog',
+    aria-modal='false',
+    [attr.aria-label]="'Edit remote text file' | translate"
+)
+    .modal-header
+        h5.modal-title.no-wrap.editor-drag-handle(cdkDragHandle)
+            i.fas.fa-grip-vertical.me-2
+            | {{ 'Edit remote text file' | translate }}: {{ fileName }}
+        button.btn-close([disabled]='saving', (click)='cancel()')
 
-.modal-body
-    .remote-text-editor-path.text-muted.small.mb-2([title]='remotePath') {{ remotePath }}
-    .remote-text-editor-hint.text-muted.small.mb-2 {{ 'UTF-8 text only; files larger than {size} are not supported.' | translate:{ size: '2 MiB' } }}
-    textarea.form-control.remote-text-editor-field(
-        #field,
-        [(ngModel)]='text',
-        [readonly]='saving',
-        spellcheck='false',
-        autocomplete='off',
-        autocapitalize='off',
-        wrap='off',
-        (keydown)='onKeydown($event)'
-    )
-    .text-warning.small.mt-2(*ngIf='dirty') {{ 'Unsaved changes' | translate }}
-    .text-danger.small.mt-2(*ngIf='saveFailed') {{ 'Could not save to the server. Check the notification and try again.' | translate }}
+    .modal-body.remote-text-editor-body
+        .remote-text-editor-path.text-muted.small.mb-2([title]='remotePath') {{ remotePath }}
+        .remote-text-editor-hint.text-muted.small.mb-2 {{ 'UTF-8 text only; files larger than {size} are not supported.' | translate:{ size: '2 MiB' } }}
+        textarea.form-control.remote-text-editor-field(
+            #field,
+            [(ngModel)]='text',
+            [readonly]='saving',
+            spellcheck='false',
+            autocomplete='off',
+            autocapitalize='off',
+            wrap='off',
+            (keydown)='onKeydown($event)'
+        )
+        .text-warning.small.mt-2(*ngIf='dirty') {{ 'Unsaved changes' | translate }}
+        .text-danger.small.mt-2(*ngIf='saveFailed') {{ 'Could not save to the server. Check the notification and try again.' | translate }}
 
-.modal-footer
-    button.btn.btn-secondary([disabled]='saving', (click)='cancel()') {{ 'Cancel' | translate }}
-    button.btn.btn-primary(
-        [disabled]='saving || !dirty',
-        (click)='save()'
-    )
-        i.fas.fa-spinner.fa-spin.me-2(*ngIf='saving')
-        span(*ngIf='saving') {{ 'Saving...' | translate }}
-        span(*ngIf='!saving') {{ 'Save to server' | translate }}
+    .modal-footer
+        .discard-confirmation.w-100.d-flex.align-items-center.gap-2(*ngIf='confirmingDiscard')
+            span.me-auto {{ 'Discard unsaved changes to {name}?' | translate:{ name: fileName } }}
+            button.btn.btn-secondary((click)='keepEditing()') {{ 'Keep editing' | translate }}
+            button.btn.btn-danger((click)='discardChanges()') {{ 'Discard changes' | translate }}
+        ng-container(*ngIf='!confirmingDiscard')
+            button.btn.btn-secondary([disabled]='saving', (click)='cancel()') {{ 'Cancel' | translate }}
+            button.btn.btn-primary(
+                [disabled]='saving || !dirty',
+                (click)='save()'
+            )
+                i.fas.fa-spinner.fa-spin.me-2(*ngIf='saving')
+                span(*ngIf='saving') {{ 'Saving...' | translate }}
+                span(*ngIf='!saving') {{ 'Save to server' | translate }}
